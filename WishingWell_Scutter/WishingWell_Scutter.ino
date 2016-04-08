@@ -11,6 +11,11 @@ String huzzahMACAddress;
 String scutterNameString;
 char scutterNameArray[25];
 
+String subsTargetString;
+char subsTargetArray[34];
+
+bool active = false;
+
 WiFiClient espClient;
 PubSubClient client(espClient);
 
@@ -48,6 +53,12 @@ void setup() {
   scutterNameString = "Scutter_" + huzzahMACAddress;
   Serial.println(scutterNameString);
   scutterNameString.toCharArray(scutterNameArray, 25);
+  subsTargetString = "wishing/" + scutterNameString;
+  subsTargetString.toCharArray(subsTargetArray, 34);
+  for (int i = 0 ; i < 34 ; i++) {
+    Serial.print(subsTargetArray[i]);
+  }
+  Serial.println();
   
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
@@ -100,9 +111,22 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.println(payloadString);
 
     // Now handle the possible messages, matching on topic
+    
+    /* TARGET CHANGED ********************************************/
+    if (topicString == subsTargetString) {
+      Serial.println(F("Scutter target signal"));
+      // Check to see if this Scutter is disabled, else enable
+      if (payloadString == "0") {
+        active = false;
+        Serial.println(F("This Scutter is now inactive"));
+      } else {
+        active = true;
+        Serial.println(F("This Scutter is now ACTIVE!"));
+      }
+    }
 
     /* REVERSE CHANGED *******************************************/
-    if (topicString == "wishing/direction") {
+    if ( (topicString == "wishing/direction") && active ) {
       if ( payloadString == "1" ) {
         servoReverse = false;
       } else if ( payloadString == "0" ) {
@@ -111,13 +135,13 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
 
     /* SERVO SPEED CHANGED ***************************************/
-    if (topicString == "wishing/speed") {
+    if ( (topicString == "wishing/speed") && active ) {
       int speedPercent = payloadString.toInt();
       // GUI client gives percent speed, so need to map:
       selectedSpeed = map(speedPercent, 0, 100, 0, 90);
     }
 
-    if (topicString == "wishing/colour") {
+    if ( (topicString == "wishing/colour") && active ) {
       // Strip the leading #
       number = strtol(&payloadString[1], NULL, 16);
       // Bitshift to extract red / green / blue values, taken mostly from:
@@ -128,7 +152,8 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
     
     /* ACT ON SETTINGS *******************************************/
-    Serial.println(F("----------------------------------------")); 
+    if (active) {
+      Serial.println(F("----------------------------------------")); 
     Serial.println(F("Executing commanded changes:"));   
     setServoSpeed(servoReverse, selectedSpeed);
     // Assume a strip of NeoPixels, even though we're likely working with just one
@@ -145,7 +170,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
     strip.show();
     Serial.println(F("========================================"));
-    
+    }
 
 //   Switch on the LED if a 1 was received as first character
     if ((char)payload[0] == '1') {
