@@ -166,30 +166,30 @@ class Ui_MainWindow(object):
         
     def mqtt_update(self):
         print "Connecting to the MQTT"
-        mqttc = mqtt.Client("python_pub")
-        mqttc.connect('localhost', 1883)
         print "Publishing scutter update codes..."
+        MQTT_Connect()
         mqttc.publish("wishing/Scutter_18:FE:34:F4:D6:F4", self.scut1.checkState())
-        print self.scut1.checkState()
+        MQTT_Connect()
         mqttc.publish("wishing/Scutter_18:FE:34:F4:D4:79", self.scut2.checkState())
-        print self.scut2.checkState()
+        MQTT_Connect()
         mqttc.publish("wishing/Scutter_5C:CF:7F:0E:2C:EA", self.scut3.checkState())
-        print self.scut3.checkState()
+        MQTT_Connect()
         mqttc.publish("wishing/Scutter_5C:CF:7F:01:59:76", self.scut4.checkState())
-        print self.scut4.checkState()
+        MQTT_Connect()
         mqttc.publish("wishing/Scutter_18:FE:34:F4:D3:BD", self.scut5.checkState())
-        print self.scut5.checkState()
+        MQTT_Connect()
         mqttc.publish("wishing/Scutter_5C:CF:7F:01:59:5B", self.scut6.checkState())
-        print self.scut6.checkState()
+        MQTT_Connect()
         mqttc.publish("wishing/Scutter_5C:CF:7F:0E:35:2D", self.scut7.checkState())
-        print self.scut7.checkState()
+        MQTT_Connect()
         mqttc.publish("wishing/Scutter_18:FE:34:FD:92:D1", self.scut8.checkState())
-        print self.scut8.checkState()
+        MQTT_Connect()
+        mqttc.publish("wishing/Scutter_5C:CF:7F:0E:31:16", self.scut9.checkState())
+        print "Update complete."
+    
+    def MQTT_Connect(self):
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_5C:CF:7F:0E:31:16", self.scut9.checkState())
-        print self.scut9.checkState()
-        print "Update complete."
         
         
         #mqttc.publish("wishing/scutter/Scutter_18:FE:34:F4:D0:7B", self.scut10.checkState())
