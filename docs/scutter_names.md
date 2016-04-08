@@ -3,7 +3,7 @@
 Left column is the label Sharpied onto the breadboard; right is the ClientID used by each scutter for its MQTT connection.
 
     Miss    :   Scutter_18:FE:34:F4:D6:F4  
-    02      :   Scutter_18:FE:34:F4:D4:79  
+    03      :   Scutter_18:FE:34:F4:D4:79  
     JB      :   Scutter_5C:CF:7F:0E:2C:EA  
     04      :   Scutter_5C:CF:7F:01:59:76  
     HE      :   Scutter_18:FE:34:F4:D3:BD  
