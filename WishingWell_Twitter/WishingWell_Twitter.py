@@ -73,7 +73,16 @@ try:
         # this is the if statement that takes the image to upload to twitter
         elif GPIO.input(tweet_btn) == False:
             time.sleep(1)
+            camera.annotate_text = '3'
+            time.sleep(1)
+            camera.annotate_text = '2'
+            time.sleep(1)
+            camera.annotate_text = '1'
+            time.sleep(1)
+            camera.annotate_text = 'Smile!'
+            time.sleep(0.7)
             camera.capture('image.jpg')
+            camera.annotate_text = ''
             # create the tweet
             photo = open('image.jpg', 'rb')
             response = twitter.upload_media(media = photo)
