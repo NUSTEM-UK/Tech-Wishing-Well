@@ -168,7 +168,7 @@ class Ui_MainWindow(object):
         print "Connecting to the MQTT"
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/speed", self.servo_num.intValue)
+        mqttc.publish("wishing/speed", self.servo_num.intValue())
         print "Publishing scutter update codes..."
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
