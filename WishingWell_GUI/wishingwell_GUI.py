@@ -185,6 +185,8 @@ class Ui_MainWindow(object):
         print self.scut7.checkState()
         mqttc.publish("wishing/Scutter_18:FE:34:FD:92:D1", self.scut8.checkState())
         print self.scut8.checkState()
+        mqttc = mqtt.Client("python_pub")
+        mqttc.connect('localhost', 1883)
         mqttc.publish("wishing/Scutter_5C:CF:7F:0E:31:16", self.scut9.checkState())
         print self.scut9.checkState()
         print "Update complete."
