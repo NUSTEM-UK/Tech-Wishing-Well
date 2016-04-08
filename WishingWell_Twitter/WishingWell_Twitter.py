@@ -80,7 +80,9 @@ try:
             camera.annotate_text = '1'
             time.sleep(1)
             camera.annotate_text = 'Smile!'
+            time.sleep(0.7)
             camera.capture('image.jpg')
+            camera.annotate_text = ''
             # create the tweet
             photo = open('image.jpg', 'rb')
             response = twitter.upload_media(media = photo)
