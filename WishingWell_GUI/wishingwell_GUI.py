@@ -170,23 +170,23 @@ class Ui_MainWindow(object):
         mqttc.connect('localhost', 1883)
         print "Publishing scutter update codes..."
         mqttc.publish("wishing/Scutter_18:FE:34:F4:D6:F4", self.scut1.checkState())
-        print "."
+        print self.scut1.checkState()
         mqttc.publish("wishing/Scutter_18:FE:34:F4:D4:79", self.scut2.checkState())
-        print "."
+        print self.scut2.checkState()
         mqttc.publish("wishing/Scutter_5C:CF:7F:0E:2C:EA", self.scut3.checkState())
-        print "."
+        print self.scut3.checkState()
         mqttc.publish("wishing/Scutter_5C:CF:7F:01:59:76", self.scut4.checkState())
-        print "."
+        print self.scut4.checkState()
         mqttc.publish("wishing/Scutter_18:FE:34:F4:D3:BD", self.scut5.checkState())
-        print "."
+        print self.scut5.checkState()
         mqttc.publish("wishing/Scutter_5C:CF:7F:01:59:5B", self.scut6.checkState())
-        print "."
+        print self.scut6.checkState()
         mqttc.publish("wishing/Scutter_5C:CF:7F:0E:35:2D", self.scut7.checkState())
-        print "."
+        print self.scut7.checkState()
         mqttc.publish("wishing/Scutter_18:FE:34:FD:92:D1", self.scut8.checkState())
-        print "."
+        print self.scut8.checkState()
         mqttc.publish("wishing/Scutter_5C:CF:7F:0E:31:16", self.scut9.checkState())
-        print "."
+        print self.scut9.checkState()
         print "Update complete."
         
         

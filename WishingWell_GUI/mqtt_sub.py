@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 
 def on_connect(client, userdata, rc):
 	print "Connected with result code: " + str(rc)
-	#client.subscribe("wishing/Scutter_18:FE:34:F4:D6:F4")
+	client.subscribe("wishing/Scutter_18:FE:34:F4:D6:F4")
 	client.subscribe("wishing/Scutter_18:FE:34:F4:D4:79")
 	client.subscribe("wishing/Scutter_5C:CF:7F:0E:2C:EA")
 	client.subscribe("wishing/Scutter_5C:CF:7F:01:59:76")
