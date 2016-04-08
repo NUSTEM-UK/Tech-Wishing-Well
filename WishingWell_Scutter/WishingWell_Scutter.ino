@@ -7,6 +7,10 @@ const char* ssid = "WishingWell";
 const char* password = "thinkphysics1";
 const char* mqtt_server = "192.168.1.101";
 
+String huzzahMACAddress;
+String scutterNameString;
+char scutterNameArray[25];
+
 WiFiClient espClient;
 PubSubClient client(espClient);
 
@@ -34,25 +38,45 @@ uint8_t r = 255;
 uint8_t g = 255;
 uint8_t b = 255;
 
-void setup_wifi() {
-  delay(10);
-  // We start by connecting to a WiFi network
-  Serial.println();
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
 
-  WiFi.begin(ssid, password);
+void setup() {
+  pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
+  Serial.begin(115200);
+  setup_wifi();
 
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-
-  Serial.println("");
-  Serial.println("WiFi connected");
-  Serial.println("IP address: ");
-  Serial.println(WiFi.localIP());
+  huzzahMACAddress = WiFi.macAddress();
+  scutterNameString = "Scutter " + huzzahMACAddress;
+  Serial.println(scutterNameString);
+  scutterNameString.toCharArray(scutterNameArray, 25);
   
+  client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
+  
+  myservo.attach(PIN_SERVO);
+  myservo.write(servoPos); // Set to zero speed so there's no servo kick on boot. Doesn't work
+  pinMode(PIN_LED_BLUE, OUTPUT);
+  pinMode(PIN_LED_RED, OUTPUT);
+  strip.begin();
+  strip.show();
+  
+}
+
+void loop() {
+
+  if (!client.connected()) {
+    reconnect();
+  }
+  client.loop();
+
+//  long now = millis();
+//  if (now - lastMsg > 2000) {
+//    lastMsg = now;
+//    ++value;
+//    snprintf (msg, 75, "hello world #%ld", value);
+////    Serial.print("Publish message: ");
+////    Serial.println(msg);
+//    client.publish("outTopic", msg);
+//  }
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -147,12 +171,35 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
  }
 
+
+void setup_wifi() {
+  delay(10);
+  // We start by connecting to a WiFi network
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+  
+}
+
+
 void reconnect() {
   // Loop until we're reconnected
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect("ESP8266Client1")) {
+    if (client.connect(scutterNameArray)) {
       Serial.println("connected");
       // Once connected, publish an announcement...
 //      client.publish("outTopic", "hello world");
@@ -182,38 +229,4 @@ void setServoSpeed(bool servoReverse, int selectedSpeed){
     Serial.println(servoPos);
   }
   myservo.write(servoPos);
-}
-
-void setup() {
-  pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
-  Serial.begin(115200);
-  setup_wifi();
-  client.setServer(mqtt_server, 1883);
-  client.setCallback(callback);
-  
-  myservo.attach(PIN_SERVO);
-  myservo.write(servoPos); // Set to zero speed so there's no servo kick on boot. Doesn't work
-  pinMode(PIN_LED_BLUE, OUTPUT);
-  pinMode(PIN_LED_RED, OUTPUT);
-  strip.begin();
-  strip.show();
-  
-}
-
-void loop() {
-
-  if (!client.connected()) {
-    reconnect();
-  }
-  client.loop();
-
-//  long now = millis();
-//  if (now - lastMsg > 2000) {
-//    lastMsg = now;
-//    ++value;
-//    snprintf (msg, 75, "hello world #%ld", value);
-////    Serial.print("Publish message: ");
-////    Serial.println(msg);
-//    client.publish("outTopic", msg);
-//  }
 }
