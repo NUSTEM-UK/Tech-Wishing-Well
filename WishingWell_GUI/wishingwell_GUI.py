@@ -165,12 +165,24 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
     def mqtt_update(self):
-        #mqttc = mqtt.Client("python_pub")
-        #mqttc.connect('localhost', 1883)
-        #mqttc.publish("wishing/scutter/", str(colour.name()))
-        #print "Update scutters..."
-        test = self.scut1.checkState()
-        print test
+        print "Connecting to the MQTT"
+        mqttc = mqtt.Client("python_pub")
+        mqttc.connect('localhost', 1883)
+        print "Publishing scutter update codes..."
+        mqttc.publish("wishing/scutter/Scutter_18:FE:34:F4:D6:F4", self.scut1.checkState())
+        mqttc.publish("wishing/scutter/Scutter_18:FE:34:F4:D4:79", self.scut2.checkState())
+        mqttc.publish("wishing/scutter/Scutter_5C:CF:7F:0E:2C:EA", self.scut3.checkState())
+        mqttc.publish("wishing/scutter/Scutter_5C:CF:7F:01:59:76", self.scut4.checkState())
+        mqttc.publish("wishing/scutter/Scutter_18:FE:34:F4:D3:BD", self.scut5.checkState())
+        mqttc.publish("wishing/scutter/Scutter_5C:CF:7F:01:59:5B", self.scut6.checkState())
+        mqttc.publish("wishing/scutter/Scutter_5C:CF:7F:0E:35:2D", self.scut7.checkState())
+        mqttc.publish("wishing/scutter/Scutter_18:FE:34:FD:92:D1", self.scut8.checkState())
+        mqttc.publish("wishing/scutter/Scutter_5C:CF:7F:0E:31:16", self.scut9.checkState())
+        print "Update complete."
+        
+        
+        #mqttc.publish("wishing/scutter/Scutter_18:FE:34:F4:D0:7B", self.scut10.checkState())
+        
         
         
 
