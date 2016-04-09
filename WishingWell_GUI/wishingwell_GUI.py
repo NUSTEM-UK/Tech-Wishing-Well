@@ -115,7 +115,7 @@ class Ui_MainWindow(object):
         self.hue_slider.setObjectName(_fromUtf8("hue_slider"))
         self.gridLayout.addWidget(self.hue_slider, 5, 2, 1, 1)
         
-        self.hue_slider.sliderReleased.connect(self.HSVtoHEXupload)
+        self.hue_slider.sliderReleased.connect(self.HSVtoHEXupload) # connect the slider to colour function
         
         # Servo LCD setup
         self.servo_num = QtGui.QLCDNumber(self.gridLayoutWidget)
@@ -171,16 +171,13 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.retranslateUi(MainWindow)
         
-        #connect the sliders to their respective LCD dials
+        # connect the sliders to their respective LCD dials
         QtCore.QObject.connect(self.bright_slider, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), self.bright_num.display)
         QtCore.QObject.connect(self.speed_dial, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), self.servo_num.display)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
     def scutter_update(self):
         print "Connecting to the MQTT"
-        mqttc = mqtt.Client("python_pub")
-        mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/speed", self.servo_num.intValue())
         print "Publishing scutter update codes..."
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
