@@ -1,8 +1,10 @@
 
 from PyQt4 import QtCore, QtGui
 import paho.mqtt.client as mqtt
+
+# these modules allow us to convert a HSV colour value to a HEX code (via RGB)
 import matplotlib.colors as colors
-import colorsys
+from colorsys import hsv_to_rgb
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -20,6 +22,8 @@ except AttributeError:
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
+        
+        # this code sets the main attributes of the window
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
         MainWindow.resize(640, 480)
         self.centralwidget = QtGui.QWidget(MainWindow)
@@ -39,68 +43,68 @@ class Ui_MainWindow(object):
         self.label_2.setObjectName(_fromUtf8("label_2"))
         self.gridLayout.addWidget(self.label_2, 4, 2, 1, 1)
         
-        # Scutter 5 Setup
-        self.scut5 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.scut5.setLayoutDirection(QtCore.Qt.RightToLeft)
-        self.scut5.setObjectName(_fromUtf8("scut5"))
-        self.gridLayout.addWidget(self.scut5, 1, 2, 1, 1)
-        
         # Scutter 1 Setup
         self.scut1 = QtGui.QCheckBox(self.gridLayoutWidget)
         self.scut1.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.scut1.setObjectName(_fromUtf8("scut1"))
         self.gridLayout.addWidget(self.scut1, 0, 0, 1, 1)
         
+        # Scutter 2 Setup
+        self.scut2 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.scut2.setLayoutDirection(QtCore.Qt.RightToLeft)
+        self.scut2.setObjectName(_fromUtf8("scut2"))
+        self.gridLayout.addWidget(self.scut2, 0, 2, 1, 1)
+        
+        # Scutter 3 Setup
+        self.scut3 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.scut3.setLayoutDirection(QtCore.Qt.RightToLeft)
+        self.scut3.setObjectName(_fromUtf8("scut3"))
+        self.gridLayout.addWidget(self.scut3, 0, 3, 1, 1)
+        
+        # Scutter 4 Setup
+        self.scut4 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.scut4.setLayoutDirection(QtCore.Qt.RightToLeft)
+        self.scut4.setObjectName(_fromUtf8("scut4"))
+        self.gridLayout.addWidget(self.scut4, 1, 0, 1, 1)
+        
+        # Scutter 5 Setup
+        self.scut5 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.scut5.setLayoutDirection(QtCore.Qt.RightToLeft)
+        self.scut5.setObjectName(_fromUtf8("scut5"))
+        self.gridLayout.addWidget(self.scut5, 1, 2, 1, 1)
+
         # Scutter 6 Setup
         self.scut6 = QtGui.QCheckBox(self.gridLayoutWidget)
         self.scut6.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.scut6.setObjectName(_fromUtf8("scut6"))
         self.gridLayout.addWidget(self.scut6, 1, 3, 1, 1)
         
-         # Scutter 6 Setup
-        self.scut8 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.scut8.setLayoutDirection(QtCore.Qt.RightToLeft)
-        self.scut8.setObjectName(_fromUtf8("scut8"))
-        self.gridLayout.addWidget(self.scut8, 2, 2, 1, 1)
-        
-         # Scutter 6 Setup
-        self.scut9 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.scut9.setLayoutDirection(QtCore.Qt.RightToLeft)
-        self.scut9.setObjectName(_fromUtf8("scut9"))
-        self.gridLayout.addWidget(self.scut9, 2, 3, 1, 1)
-        
-         # Scutter 6 Setup
-        self.scut4 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.scut4.setLayoutDirection(QtCore.Qt.RightToLeft)
-        self.scut4.setObjectName(_fromUtf8("scut4"))
-        self.gridLayout.addWidget(self.scut4, 1, 0, 1, 1)
-        
-         # Scutter 6 Setup
+        # Scutter 7 Setup
         self.scut7 = QtGui.QCheckBox(self.gridLayoutWidget)
         self.scut7.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.scut7.setObjectName(_fromUtf8("scut7"))
         self.gridLayout.addWidget(self.scut7, 2, 0, 1, 1)
         
-         # Scutter 6 Setup
-        self.scut2 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.scut2.setLayoutDirection(QtCore.Qt.RightToLeft)
-        self.scut2.setObjectName(_fromUtf8("scut2"))
-        self.gridLayout.addWidget(self.scut2, 0, 2, 1, 1)
+        # Scutter 8 Setup
+        self.scut8 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.scut8.setLayoutDirection(QtCore.Qt.RightToLeft)
+        self.scut8.setObjectName(_fromUtf8("scut8"))
+        self.gridLayout.addWidget(self.scut8, 2, 2, 1, 1)
         
-         # Scutter 6 Setup
-        self.scut3 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.scut3.setLayoutDirection(QtCore.Qt.RightToLeft)
-        self.scut3.setObjectName(_fromUtf8("scut3"))
-        self.gridLayout.addWidget(self.scut3, 0, 3, 1, 1)
+        # Scutter 9 Setup
+        self.scut9 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.scut9.setLayoutDirection(QtCore.Qt.RightToLeft)
+        self.scut9.setObjectName(_fromUtf8("scut9"))
+        self.gridLayout.addWidget(self.scut9, 2, 3, 1, 1)
         
         # send_update button
         self.send_update = QtGui.QPushButton(self.gridLayoutWidget)
         self.send_update.setObjectName(_fromUtf8("send_update"))
         self.gridLayout.addWidget(self.send_update, 7, 2, 1, 1)
         
-        # when the button is clicked, run the self.mqtt_update
-        self.send_update.clicked.connect(self.scutUpdate)
-        
+        # when the button is clicked, run the self.scutter_update
+        self.send_update.clicked.connect(self.scutter_update)
+    
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem, 3, 2, 1, 1)
         
@@ -117,7 +121,6 @@ class Ui_MainWindow(object):
         self.servo_num = QtGui.QLCDNumber(self.gridLayoutWidget)
         self.servo_num.setObjectName(_fromUtf8("servo_num"))
         self.gridLayout.addWidget(self.servo_num, 6, 0, 1, 1)
-        
         
         self.label = QtGui.QLabel(self.gridLayoutWidget)
         self.label.setAlignment(QtCore.Qt.AlignCenter)
@@ -165,13 +168,14 @@ class Ui_MainWindow(object):
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
         MainWindow.setStatusBar(self.statusbar)
-
         self.retranslateUi(MainWindow)
+        
+        #connect the sliders to their respective LCD dials
         QtCore.QObject.connect(self.bright_slider, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), self.bright_num.display)
         QtCore.QObject.connect(self.speed_dial, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), self.servo_num.display)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
-    def mqtt_update(self):
+    def scutter_update(self):
         print "Connecting to the MQTT"
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
