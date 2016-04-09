@@ -1,6 +1,7 @@
 
 from PyQt4 import QtCore, QtGui
 import paho.mqtt.client as mqtt
+from scutter_updater import *
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -97,7 +98,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.send_update, 7, 2, 1, 1)
         
         # when the button is clicked, run the self.mqtt_update
-        self.send_update.clicked.connect(self.mqtt_update)
+        self.send_update.clicked.connect(self.scutUpdate)
         
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem, 3, 2, 1, 1)
@@ -164,43 +165,43 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.speed_dial, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), self.servo_num.display)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
-    def mqtt_update(self):
-        print "Connecting to the MQTT"
-        mqttc = mqtt.Client("python_pub")
-        mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/speed", self.servo_num.intValue())
-        print "Publishing scutter update codes..."
-        mqttc = mqtt.Client("python_pub")
-        mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_18:FE:34:F4:D6:F4", self.scut1.checkState())
-        mqttc = mqtt.Client("python_pub")
-        mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_18:FE:34:F4:D4:79", self.scut2.checkState())
-        mqttc = mqtt.Client("python_pub")
-        mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_5C:CF:7F:0E:2C:EA", self.scut3.checkState())
-        mqttc = mqtt.Client("python_pub")
-        mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_5C:CF:7F:01:59:76", self.scut4.checkState())
-        mqttc = mqtt.Client("python_pub")
-        mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_18:FE:34:F4:D3:BD", self.scut5.checkState())
-        mqttc = mqtt.Client("python_pub")
-        mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_5C:CF:7F:01:59:5B", self.scut6.checkState())
-        mqttc = mqtt.Client("python_pub")
-        mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_5C:CF:7F:0E:35:2D", self.scut7.checkState())
-        mqttc = mqtt.Client("python_pub")
-        mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_18:FE:34:FD:92:D1", self.scut8.checkState())
-        mqttc = mqtt.Client("python_pub")
-        mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_5C:CF:7F:0E:31:16", self.scut9.checkState())
-        print "Update complete."
+    # def mqtt_update(self):
+    #     print "Connecting to the MQTT"
+    #     mqttc = mqtt.Client("python_pub")
+    #     mqttc.connect('localhost', 1883)
+    #     mqttc.publish("wishing/speed", self.servo_num.intValue())
+    #     print "Publishing scutter update codes..."
+    #     mqttc = mqtt.Client("python_pub")
+    #     mqttc.connect('localhost', 1883)
+    #     mqttc.publish("wishing/Scutter_18:FE:34:F4:D6:F4", self.scut1.checkState())
+    #     mqttc = mqtt.Client("python_pub")
+    #     mqttc.connect('localhost', 1883)
+    #     mqttc.publish("wishing/Scutter_18:FE:34:F4:D4:79", self.scut2.checkState())
+    #     mqttc = mqtt.Client("python_pub")
+    #     mqttc.connect('localhost', 1883)
+    #     mqttc.publish("wishing/Scutter_5C:CF:7F:0E:2C:EA", self.scut3.checkState())
+    #     mqttc = mqtt.Client("python_pub")
+    #     mqttc.connect('localhost', 1883)
+    #     mqttc.publish("wishing/Scutter_5C:CF:7F:01:59:76", self.scut4.checkState())
+    #     mqttc = mqtt.Client("python_pub")
+    #     mqttc.connect('localhost', 1883)
+    #     mqttc.publish("wishing/Scutter_18:FE:34:F4:D3:BD", self.scut5.checkState())
+    #     mqttc = mqtt.Client("python_pub")
+    #     mqttc.connect('localhost', 1883)
+    #     mqttc.publish("wishing/Scutter_5C:CF:7F:01:59:5B", self.scut6.checkState())
+    #     mqttc = mqtt.Client("python_pub")
+    #     mqttc.connect('localhost', 1883)
+    #     mqttc.publish("wishing/Scutter_5C:CF:7F:0E:35:2D", self.scut7.checkState())
+    #     mqttc = mqtt.Client("python_pub")
+    #     mqttc.connect('localhost', 1883)
+    #     mqttc.publish("wishing/Scutter_18:FE:34:FD:92:D1", self.scut8.checkState())
+    #     mqttc = mqtt.Client("python_pub")
+    #     mqttc.connect('localhost', 1883)
+    #     mqttc.publish("wishing/Scutter_5C:CF:7F:0E:31:16", self.scut9.checkState())
+    #     print "Update complete."
     
         
-        #mqttc.publish("wishing/scutter/Scutter_18:FE:34:F4:D0:7B", self.scut10.checkState())
+    #     #mqttc.publish("wishing/scutter/Scutter_18:FE:34:F4:D0:7B", self.scut10.checkState())
         
         
         
