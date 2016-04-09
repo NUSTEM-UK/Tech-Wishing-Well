@@ -137,7 +137,7 @@ class Ui_MainWindow(object):
         self.speed_dial.setObjectName(_fromUtf8("speed_dial"))
         self.gridLayout.addWidget(self.speed_dial, 5, 0, 1, 1)
         
-        self.speed_dial.sliderReleased.connect(self.speed_update)
+        self.speed_dial.sliderReleased.connect(self.speed_update)   #connect the speed slider to the speed_update function
         
         # Brightness LCD setup
         self.bright_num = QtGui.QLCDNumber(self.gridLayoutWidget)
@@ -151,7 +151,7 @@ class Ui_MainWindow(object):
         self.bright_slider.setObjectName(_fromUtf8("bright_slider"))
         self.gridLayout.addWidget(self.bright_slider, 5, 3, 1, 1)
         
-        self.bright_slider.sliderReleased.connect(self.HSVtoHEXupload)
+        self.bright_slider.sliderReleased.connect(self.HSVtoHEXupload)  #connect the brightness slider to the colour update function
         
         # Colour frame display setup
         self.colourframe = QtGui.QFrame(self.gridLayoutWidget)
