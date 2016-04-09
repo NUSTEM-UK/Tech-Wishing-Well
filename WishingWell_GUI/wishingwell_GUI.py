@@ -4,7 +4,7 @@ import paho.mqtt.client as mqtt
 
 # these modules allow us to convert a HSV colour value to a HEX code (via RGB)
 import matplotlib.colors as colors
-from colorsys import hsv_to_rgb
+import colorsys
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -137,12 +137,13 @@ class Ui_MainWindow(object):
         self.speed_dial.setObjectName(_fromUtf8("speed_dial"))
         self.gridLayout.addWidget(self.speed_dial, 5, 0, 1, 1)
         
+        self.speed_dial.sliderReleased.connect(self.speed_update)
+        
         # Brightness LCD setup
         self.bright_num = QtGui.QLCDNumber(self.gridLayoutWidget)
         self.bright_num.setObjectName(_fromUtf8("bright_num"))
         self.gridLayout.addWidget(self.bright_num, 6, 3, 1, 1)
         
-
         # Brightness slider setup
         self.bright_slider = QtGui.QSlider(self.gridLayoutWidget)
         self.bright_slider.setMaximum(100)
@@ -216,10 +217,10 @@ class Ui_MainWindow(object):
         v = self.bright_slider.value() /100
         h = self.hue_slider.value() / 100
         
-        #convert the HSV to RGB
+        # convert the HSV to RGB
         rgb_colours = colorsys.hsv_to_rgb(h,s,v)
         
-        #convert the RGB to hax
+        #convert the RGB to HEX
         hex_colour = colors.rgb2hex((rgb_colours[0], rgb_colours[1], rgb_colours[2]))
         
         # now publish the colour code to MQTT
@@ -229,8 +230,11 @@ class Ui_MainWindow(object):
         
         # and update the colour frame on the GUI
             
+    def speed_update(self):
+        mqttc = mqtt.Client("python_pub")
+        mqttc.connect('localhost', 1883)
+        mqttc.publish("wishing/speed", self.speed_dial.value())
         
-
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
         self.label_3.setText(_translate("MainWindow", "Brightness", None))
@@ -246,7 +250,6 @@ class Ui_MainWindow(object):
         self.scut3.setText(_translate("MainWindow", "Scutter 3", None))
         self.send_update.setText(_translate("MainWindow", "Send Update", None))
         self.label.setText(_translate("MainWindow", "Servo Speed", None))
-
 
 if __name__ == "__main__":
     import sys
