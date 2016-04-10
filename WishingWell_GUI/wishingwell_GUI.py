@@ -105,6 +105,7 @@ class Ui_MainWindow(object):
         # when the button is clicked, run the self.scutter_update
         self.send_update.clicked.connect(self.scutter_update)
     
+        # this is padding for the grid that all the QObjects are placed within
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.gridLayout.addItem(spacerItem, 3, 2, 1, 1)
         
@@ -115,7 +116,8 @@ class Ui_MainWindow(object):
         self.hue_slider.setObjectName(_fromUtf8("hue_slider"))
         self.gridLayout.addWidget(self.hue_slider, 5, 2, 1, 1)
         
-        self.hue_slider.sliderReleased.connect(self.HSVtoHEXupload) # connect the slider to colour function
+        # connect the slider to colour function
+        self.hue_slider.sliderReleased.connect(self.HSVtoHEXupload) 
         
         # Servo LCD setup
         self.servo_num = QtGui.QLCDNumber(self.gridLayoutWidget)
@@ -137,7 +139,8 @@ class Ui_MainWindow(object):
         self.speed_dial.setObjectName(_fromUtf8("speed_dial"))
         self.gridLayout.addWidget(self.speed_dial, 5, 0, 1, 1)
         
-        self.speed_dial.sliderReleased.connect(self.speed_update)   #connect the speed slider to the speed_update function
+        # connect the speed slider to the speed_update function
+        self.speed_dial.sliderReleased.connect(self.speed_update)   
         
         # Brightness LCD setup
         self.bright_num = QtGui.QLCDNumber(self.gridLayoutWidget)
@@ -151,7 +154,8 @@ class Ui_MainWindow(object):
         self.bright_slider.setObjectName(_fromUtf8("bright_slider"))
         self.gridLayout.addWidget(self.bright_slider, 5, 3, 1, 1)
         
-        self.bright_slider.sliderReleased.connect(self.HSVtoHEXupload)  #connect the brightness slider to the colour update function
+        #connect the brightness slider to the colour update function
+        self.bright_slider.sliderReleased.connect(self.HSVtoHEXupload)  
         
         # Colour frame display setup
         self.colourframe = QtGui.QFrame(self.gridLayoutWidget)
