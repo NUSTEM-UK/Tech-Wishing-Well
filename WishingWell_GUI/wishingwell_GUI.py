@@ -235,7 +235,14 @@ class Ui_MainWindow(object):
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
         mqttc.publish("wishing/speed", self.speed_dial.value())
-        
+    
+    # crazy idea about the publishing function goes here
+    
+    def MQTT_publish(self, topic, data):
+        mqttc = mqtt.Client("python_pub")
+        mqttc.connect('localhost', 1883)
+        mqttc.publish(topic, data)
+                
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
         self.label_3.setText(_translate("MainWindow", "Brightness", None))
