@@ -111,7 +111,7 @@ class Ui_MainWindow(object):
         
         # Hue slider setup
         self.hue_slider = QtGui.QSlider(self.gridLayoutWidget)
-        self.hue_slider.setMaximum(255)
+        self.hue_slider.setMaximum(100.0)
         self.hue_slider.setOrientation(QtCore.Qt.Horizontal)
         self.hue_slider.setObjectName(_fromUtf8("hue_slider"))
         self.gridLayout.addWidget(self.hue_slider, 5, 2, 1, 1)
@@ -149,7 +149,7 @@ class Ui_MainWindow(object):
         
         # Brightness slider setup
         self.bright_slider = QtGui.QSlider(self.gridLayoutWidget)
-        self.bright_slider.setMaximum(100)
+        self.bright_slider.setMaximum(100.0)
         self.bright_slider.setOrientation(QtCore.Qt.Horizontal)
         self.bright_slider.setObjectName(_fromUtf8("bright_slider"))
         self.gridLayout.addWidget(self.bright_slider, 5, 3, 1, 1)
@@ -215,9 +215,8 @@ class Ui_MainWindow(object):
         
     def HSVtoHEXupload(self):
         s = 1
-        v = self.bright_slider.value() /100
-        h = self.hue_slider.value() / 100
-        
+        v = self.bright_slider.value() /100.0
+        h = self.hue_slider.value() / 100.0
         # convert the HSV to RGB
         rgb_colours = colorsys.hsv_to_rgb(h,s,v)
         
@@ -230,6 +229,8 @@ class Ui_MainWindow(object):
         mqttc.publish("wishing/colour", hex_colour)
         
         # and update the colour frame on the GUI
+        self.colourframe.setStyleSheet("QFrame { background-color: %s}" % hex_colour)
+        
             
     def speed_update(self):
         mqttc = mqtt.Client("python_pub")
@@ -237,12 +238,12 @@ class Ui_MainWindow(object):
         mqttc.publish("wishing/speed", self.speed_dial.value())
     
     # crazy idea about the publishing function goes here
-    
+
     def MQTT_publish(self, topic, data):
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
         mqttc.publish(topic, data)
-                
+
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
         self.label_3.setText(_translate("MainWindow", "Brightness", None))
