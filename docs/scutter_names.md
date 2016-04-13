@@ -13,5 +13,5 @@ Left column is the label Sharpied onto the breadboard; right is the ClientID use
     09      :   Scutter_5C:CF:7F:0E:31:16  
     KT      :   Scutter_18:FE:34:F4:D0:7B
     
-    Spare01 :   Scutter 18:FE:34:FD:93:33
+    Spare01 :   Scutter_18:FE:34:FD:93:33
 

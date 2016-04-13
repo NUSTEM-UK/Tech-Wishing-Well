@@ -45,7 +45,7 @@ void setup() {
   setup_wifi();
 
   huzzahMACAddress = WiFi.macAddress();
-  scutterNameString = "Scutter " + huzzahMACAddress;
+  scutterNameString = "Scutter_" + huzzahMACAddress;
   Serial.println(scutterNameString);
   scutterNameString.toCharArray(scutterNameArray, 25);
   
