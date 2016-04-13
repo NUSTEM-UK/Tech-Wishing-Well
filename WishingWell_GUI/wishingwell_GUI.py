@@ -290,8 +290,6 @@ class Ui_MainWindow(object):
             checkbox_status = False
             
     def scutter_update(self):
-        print "Connecting to the MQTT"
-        print "Publishing scutter update codes..."
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
         mqttc.publish("wishing/Scutter_18:FE:34:F4:D6:F4", self.scut1.isChecked())
@@ -321,19 +319,15 @@ class Ui_MainWindow(object):
         mqttc.publish("wishing/Scutter_5C:CF:7F:0E:31:16", self.scut9.isChecked())
         mqttc.connect('localhost', 1883)
         mqttc.publish("wishing/scutter/Scutter_18:FE:34:F4:D0:7B", self.scut10.checkState())
-        print "Update complete."
-        print "Publishing current settings"
         self.settings_update()
         
     def settings_update(self):
         # publish the servo speed
-        print "Publishing new servo speed: %s" % self.servo_dial.value()
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
         mqttc.publish("wishing/speed", self.servo_dial.value())
         
         # publish the time for the colour changed
-        print "Publishing new colour change time: %s" % self.trans_time.value()
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
         mqttc.publish("wishing/time", self.trans_time.value())
@@ -346,13 +340,11 @@ class Ui_MainWindow(object):
         rgb_colours = colorsys.hsv_to_rgb(h,s,v)
             #convert the RGB to HEX
         hex_colour = colors.rgb2hex((rgb_colours[0], rgb_colours[1], rgb_colours[2]))
-        print "Publishing new colour change colour: %s" % hex_colour
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
         mqttc.publish("wishing/colour", hex_colour)
         
         # publsih the radio value for the fade or wheel
-        print "Trans/wheel?? %s" % self.trans_wheel.isChecked()
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
         if self.trans_wheel.isChecked() == True:
@@ -369,8 +361,7 @@ class Ui_MainWindow(object):
         
         #convert the RGB to HEX
         hex_colour = colors.rgb2hex((rgb_colours[0], rgb_colours[1], rgb_colours[2]))
-        print hex_colour
-        
+
         # and update the colour frame on the GUI
         self.colour_display.setStyleSheet("QFrame { background-color: %s}" % hex_colour)
     
