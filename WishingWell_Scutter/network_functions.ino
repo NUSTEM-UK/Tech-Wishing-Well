@@ -31,6 +31,7 @@ void reconnect() {
       // Once connected, publish an announcement...
 //      client.publish("outTopic", "hello world");
       // ... and resubscribe
+      client.subscribe(subsTargetArray);
       client.subscribe("wishing/colour");
       client.subscribe("wishing/direction");
       client.subscribe("wishing/speed");
