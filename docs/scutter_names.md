@@ -1,17 +1,17 @@
-# Scutter Names & MAC addresses
+# Skutter Names & MAC addresses
 
-Left column is the label Sharpied onto the breadboard; right is the ClientID used by each scutter for its MQTT connection.
+Left column is the label Sharpied onto the breadboard; right is the ClientID used by each Skutter for its MQTT connection.
 
-    Miss    :   Scutter_18:FE:34:F4:D6:F4  
-    03      :   Scutter_18:FE:34:F4:D4:79  
-    JB      :   Scutter_5C:CF:7F:0E:2C:EA  
-    04      :   Scutter_5C:CF:7F:01:59:76  
-    HE      :   Scutter_18:FE:34:F4:D3:BD  
-    06      :   Scutter_5C:CF:7F:01:59:5B  
-    LA      :   Scutter_5C:CF:7F:0E:35:2D  
-    JJS     :   Scutter_18:FE:34:FD:92:D1  
-    09      :   Scutter_5C:CF:7F:0E:31:16  
-    KT      :   Scutter_18:FE:34:F4:D0:7B
+    Miss    :   Skutter_18:FE:34:F4:D6:F4  
+    03      :   Skutter_18:FE:34:F4:D4:79  
+    JB      :   Skutter_5C:CF:7F:0E:2C:EA  
+    04      :   Skutter_5C:CF:7F:01:59:76  
+    HE      :   Skutter_18:FE:34:F4:D3:BD  
+    06      :   Skutter_5C:CF:7F:01:59:5B  
+    LA      :   Skutter_5C:CF:7F:0E:35:2D  
+    JJS     :   Skutter_18:FE:34:FD:92:D1  
+    09      :   Skutter_5C:CF:7F:0E:31:16  
+    KT      :   Skutter_18:FE:34:F4:D0:7B
     
-    Spare01 :   Scutter_18:FE:34:FD:93:33
+    Spare01 :   Skutter_18:FE:34:FD:93:33
 

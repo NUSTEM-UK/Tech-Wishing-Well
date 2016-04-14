@@ -1,3 +1,17 @@
+#############################################################################
+# This code outputs data from the GUI to the following MQTT topics on       #
+# 'localhost', port '1883'                                                  #
+#                                                                           #
+#   Topic/Subtopic                      Values                              #
+#   wishing/scutter_MAC_ADDRESS         bool True / False                   #
+#   Wishing/speed                       int 0 - 100                         #
+#   wishing/colour                      hex colour code                     #
+#   wishing/time                        int >= 0                            #
+#   wishing/transition                  wheel / fade                        #
+#   wishing/direction                   forwards / reverse                  #
+#                                                                           #
+#############################################################################
+
 from PyQt4 import QtCore, QtGui
 import paho.mqtt.client as mqtt
 
@@ -56,9 +70,9 @@ class Ui_MainWindow(object):
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.left_grid_layout.addItem(spacerItem, 5, 1, 1, 1)
         
-        self.scut3 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.scut3.setObjectName(_fromUtf8("scut3"))
-        self.left_grid_layout.addWidget(self.scut3, 1, 2, 1, 1)
+        self.skut3 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut3.setObjectName(_fromUtf8("skut3"))
+        self.left_grid_layout.addWidget(self.skut3, 1, 2, 1, 1)
         
         self.vertical_layout_colour = QtGui.QVBoxLayout()
         self.vertical_layout_colour.setObjectName(_fromUtf8("vertical_layout_colour"))
@@ -88,17 +102,17 @@ class Ui_MainWindow(object):
         self.vertical_layout_colour.addWidget(self.colour_display)
         self.left_grid_layout.addLayout(self.vertical_layout_colour, 7, 1, 1, 1)
         
-        self.scut4 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.scut4.setObjectName(_fromUtf8("scut4"))
-        self.left_grid_layout.addWidget(self.scut4, 1, 3, 1, 1)
+        self.skut4 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut4.setObjectName(_fromUtf8("skut4"))
+        self.left_grid_layout.addWidget(self.skut4, 1, 3, 1, 1)
         
-        self.scut9 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.scut9.setObjectName(_fromUtf8("scut9"))
-        self.left_grid_layout.addWidget(self.scut9, 3, 0, 1, 1)
+        self.skut9 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut9.setObjectName(_fromUtf8("skut9"))
+        self.left_grid_layout.addWidget(self.skut9, 3, 0, 1, 1)
         
-        self.scut1 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.scut1.setObjectName(_fromUtf8("scut1"))
-        self.left_grid_layout.addWidget(self.scut1, 1, 0, 1, 1)
+        self.skut1 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut1.setObjectName(_fromUtf8("skut1"))
+        self.left_grid_layout.addWidget(self.skut1, 1, 0, 1, 1)
         self.vertical_layout_wheel = QtGui.QVBoxLayout()
         self.vertical_layout_wheel.setObjectName(_fromUtf8("vertical_layout_wheel"))
         self.trans_wheel = QtGui.QRadioButton(self.gridLayoutWidget)
@@ -108,32 +122,32 @@ class Ui_MainWindow(object):
         self.tran_fade.setObjectName(_fromUtf8("tran_fade"))
         self.vertical_layout_wheel.addWidget(self.tran_fade)
         self.left_grid_layout.addLayout(self.vertical_layout_wheel, 7, 2, 1, 1)
-        self.scut6 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.scut6.setObjectName(_fromUtf8("scut6"))
-        self.left_grid_layout.addWidget(self.scut6, 2, 1, 1, 1)
-        self.scut2 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.scut2.setObjectName(_fromUtf8("scut2"))
-        self.left_grid_layout.addWidget(self.scut2, 1, 1, 1, 1)
-        self.scut5 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.scut5.setObjectName(_fromUtf8("scut5"))
-        self.left_grid_layout.addWidget(self.scut5, 2, 0, 1, 1)
-        self.scut7 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.scut7.setObjectName(_fromUtf8("scut7"))
-        self.left_grid_layout.addWidget(self.scut7, 2, 2, 1, 1)
-        self.scut10 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.scut10.setObjectName(_fromUtf8("scut10"))
-        self.left_grid_layout.addWidget(self.scut10, 3, 1, 1, 1)
-        self.scut8 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.scut8.setObjectName(_fromUtf8("scut8"))
-        self.left_grid_layout.addWidget(self.scut8, 2, 3, 1, 1)
-        self.scutter_control_label = QtGui.QLabel(self.gridLayoutWidget)
+        self.skut6 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut6.setObjectName(_fromUtf8("skut6"))
+        self.left_grid_layout.addWidget(self.skut6, 2, 1, 1, 1)
+        self.skut2 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut2.setObjectName(_fromUtf8("skut2"))
+        self.left_grid_layout.addWidget(self.skut2, 1, 1, 1, 1)
+        self.skut5 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut5.setObjectName(_fromUtf8("skut5"))
+        self.left_grid_layout.addWidget(self.skut5, 2, 0, 1, 1)
+        self.skut7 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut7.setObjectName(_fromUtf8("skut7"))
+        self.left_grid_layout.addWidget(self.skut7, 2, 2, 1, 1)
+        self.skut10 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut10.setObjectName(_fromUtf8("skut10"))
+        self.left_grid_layout.addWidget(self.skut10, 3, 1, 1, 1)
+        self.skut8 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut8.setObjectName(_fromUtf8("skut8"))
+        self.left_grid_layout.addWidget(self.skut8, 2, 3, 1, 1)
+        self.skutter_control_label = QtGui.QLabel(self.gridLayoutWidget)
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
-        self.scutter_control_label.setFont(font)
-        self.scutter_control_label.setScaledContents(True)
-        self.scutter_control_label.setObjectName(_fromUtf8("scutter_control_label"))
-        self.left_grid_layout.addWidget(self.scutter_control_label, 0, 0, 1, 1)
+        self.skutter_control_label.setFont(font)
+        self.skutter_control_label.setScaledContents(True)
+        self.skutter_control_label.setObjectName(_fromUtf8("skutter_control_label"))
+        self.left_grid_layout.addWidget(self.skutter_control_label, 0, 0, 1, 1)
         
         # vertical layout for the servo control
         self.vertical_layout_servo = QtGui.QVBoxLayout()
@@ -164,14 +178,14 @@ class Ui_MainWindow(object):
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.vertical_layout_time.addItem(spacerItem1)
         self.left_grid_layout.addLayout(self.vertical_layout_time, 7, 3, 1, 1)
-        self.scut_update = QtGui.QPushButton(self.gridLayoutWidget)
-        self.scut_update.setObjectName(_fromUtf8("scut_update"))
-        self.left_grid_layout.addWidget(self.scut_update, 9, 3, 1, 1)
+        self.skut_update = QtGui.QPushButton(self.gridLayoutWidget)
+        self.skut_update.setObjectName(_fromUtf8("skut_update"))
+        self.left_grid_layout.addWidget(self.skut_update, 9, 3, 1, 1)
         spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.left_grid_layout.addItem(spacerItem2, 8, 3, 1, 1)
-        self.scut_toggle = QtGui.QPushButton(self.gridLayoutWidget)
-        self.scut_toggle.setObjectName(_fromUtf8("scut_toggle"))
-        self.left_grid_layout.addWidget(self.scut_toggle, 4, 3, 1, 1)
+        self.skut_toggle = QtGui.QPushButton(self.gridLayoutWidget)
+        self.skut_toggle.setObjectName(_fromUtf8("skut_toggle"))
+        self.left_grid_layout.addWidget(self.skut_toggle, 4, 3, 1, 1)
         self.gridLayoutWidget_2 = QtGui.QWidget(self.centralwidget)
         self.gridLayoutWidget_2.setGeometry(QtCore.QRect(740, 100, 191, 401))
         self.gridLayoutWidget_2.setObjectName(_fromUtf8("gridLayoutWidget_2"))
@@ -250,10 +264,10 @@ class Ui_MainWindow(object):
         
         #button clicked controls for the various buttons and checkboxes on the GUI
         # Select All / None button
-        self.scut_toggle.clicked.connect(self.scut_toggler)
+        self.skut_toggle.clicked.connect(self.skut_toggler)
         
         # Send update button
-        self.scut_update.clicked.connect(self.scutter_update)
+        self.skut_update.clicked.connect(self.skutter_update)
                         
         # hue slider
         self.hue_slider.sliderReleased.connect(self.HSVtoHEXupload) 
@@ -261,64 +275,64 @@ class Ui_MainWindow(object):
         # brightness slider
         self.bright_slider.sliderReleased.connect(self.HSVtoHEXupload) 
                
-    def scut_toggler(self):
-        self.scut1.setChecked(True)
+    def skut_toggler(self):
+        self.skut1.setChecked(True)
         global checkbox_status
         if checkbox_status == False:
-            self.scut1.setChecked(True)
-            self.scut2.setChecked(True)
-            self.scut3.setChecked(True)
-            self.scut4.setChecked(True)
-            self.scut5.setChecked(True)
-            self.scut6.setChecked(True)
-            self.scut7.setChecked(True)
-            self.scut8.setChecked(True)
-            self.scut9.setChecked(True)
-            self.scut10.setChecked(True)
+            self.skut1.setChecked(True)
+            self.skut2.setChecked(True)
+            self.skut3.setChecked(True)
+            self.skut4.setChecked(True)
+            self.skut5.setChecked(True)
+            self.skut6.setChecked(True)
+            self.skut7.setChecked(True)
+            self.skut8.setChecked(True)
+            self.skut9.setChecked(True)
+            self.skut10.setChecked(True)
             checkbox_status = True
         else:
-            self.scut1.setChecked(False)
-            self.scut2.setChecked(False)
-            self.scut3.setChecked(False)
-            self.scut4.setChecked(False)
-            self.scut5.setChecked(False)
-            self.scut6.setChecked(False)
-            self.scut7.setChecked(False)
-            self.scut8.setChecked(False)
-            self.scut9.setChecked(False)
-            self.scut10.setChecked(False)
+            self.skut1.setChecked(False)
+            self.skut2.setChecked(False)
+            self.skut3.setChecked(False)
+            self.skut4.setChecked(False)
+            self.skut5.setChecked(False)
+            self.skut6.setChecked(False)
+            self.skut7.setChecked(False)
+            self.skut8.setChecked(False)
+            self.skut9.setChecked(False)
+            self.skut10.setChecked(False)
             checkbox_status = False
             
-    def scutter_update(self):
+    def skutter_update(self):
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_18:FE:34:F4:D6:F4", self.scut1.isChecked())
+        mqttc.publish("wishing/skutter_18:FE:34:F4:D6:F4", self.skut1.isChecked())
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_18:FE:34:F4:D4:79", self.scut2.isChecked())
+        mqttc.publish("wishing/skutter_18:FE:34:F4:D4:79", self.skut2.isChecked())
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_5C:CF:7F:0E:2C:EA", self.scut3.isChecked())
+        mqttc.publish("wishing/skutter_5C:CF:7F:0E:2C:EA", self.skut3.isChecked())
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_5C:CF:7F:01:59:76", self.scut4.isChecked())
+        mqttc.publish("wishing/skutter_5C:CF:7F:01:59:76", self.skut4.isChecked())
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_18:FE:34:F4:D3:BD", self.scut5.isChecked())
+        mqttc.publish("wishing/skutter_18:FE:34:F4:D3:BD", self.skut5.isChecked())
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_5C:CF:7F:01:59:5B", self.scut6.isChecked())
+        mqttc.publish("wishing/skutter_5C:CF:7F:01:59:5B", self.skut6.isChecked())
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_5C:CF:7F:0E:35:2D", self.scut7.isChecked())
+        mqttc.publish("wishing/skutter_5C:CF:7F:0E:35:2D", self.skut7.isChecked())
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_18:FE:34:FD:92:D1", self.scut8.isChecked())
+        mqttc.publish("wishing/skutter_18:FE:34:FD:92:D1", self.skut8.isChecked())
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/Scutter_5C:CF:7F:0E:31:16", self.scut9.isChecked())
+        mqttc.publish("wishing/skutter_5C:CF:7F:0E:31:16", self.skut9.isChecked())
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/scutter/Scutter_18:FE:34:F4:D0:7B", self.scut10.checkState())
+        mqttc.publish("wishing/skutter/skutter_18:FE:34:F4:D0:7B", self.skut10.checkState())
         self.settings_update()
         
     def settings_update(self):
@@ -344,13 +358,21 @@ class Ui_MainWindow(object):
         mqttc.connect('localhost', 1883)
         mqttc.publish("wishing/colour", hex_colour)
         
-        # publsih the radio value for the fade or wheel
+        # publish the radio value for the fade or wheel
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
         if self.trans_wheel.isChecked() == True:
-            mqttc.publish("wishing/transition", "Wheel")
+            mqttc.publish("wishing/transition", "wheel")
         else:
             mqttc.publish("wishing/transition", "fade")
+            
+        # publish the radio value for the direction
+        mqttc = mqtt.Client("python_pub")
+        mqttc.connect('localhost', 1883)
+        if self.clockwise.isChecked() == True:
+            mqttc.publish("wishing/direction", "clockwise")
+        else:
+            mqttc.publish("wishing/direction", "anticlockwise")
         
     def HSVtoHEXupload(self):
         s = 1
@@ -369,24 +391,24 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow", None))
         self.servo_control_label.setText(_translate("MainWindow", "Servo Control", None))
         self.colour_control_label.setText(_translate("MainWindow", "Colour Control", None))
-        self.scut3.setText(_translate("MainWindow", "Scutter 3", None))
+        self.skut3.setText(_translate("MainWindow", "skutter 3", None))
         self.brightness_label.setText(_translate("MainWindow", "Brightness", None))
         self.hue_label.setText(_translate("MainWindow", "Hue", None))
-        self.scut4.setText(_translate("MainWindow", "Scutter 4", None))
-        self.scut9.setText(_translate("MainWindow", "Scutter 9", None))
-        self.scut1.setText(_translate("MainWindow", "Scutter 1", None))
+        self.skut4.setText(_translate("MainWindow", "skutter 4", None))
+        self.skut9.setText(_translate("MainWindow", "skutter 9", None))
+        self.skut1.setText(_translate("MainWindow", "skutter 1", None))
         self.trans_wheel.setText(_translate("MainWindow", "Wheel", None))
         self.tran_fade.setText(_translate("MainWindow", "Fade", None))
-        self.scut6.setText(_translate("MainWindow", "Scutter 6", None))
-        self.scut2.setText(_translate("MainWindow", "Scutter 2", None))
-        self.scut5.setText(_translate("MainWindow", "Scutter 5", None))
-        self.scut7.setText(_translate("MainWindow", "Scutter 7", None))
-        self.scut10.setText(_translate("MainWindow", "Scutter 10", None))
-        self.scut8.setText(_translate("MainWindow", "Scutter 8", None))
-        self.scutter_control_label.setText(_translate("MainWindow", "Scutter Control", None))
+        self.skut6.setText(_translate("MainWindow", "skutter 6", None))
+        self.skut2.setText(_translate("MainWindow", "skutter 2", None))
+        self.skut5.setText(_translate("MainWindow", "skutter 5", None))
+        self.skut7.setText(_translate("MainWindow", "skutter 7", None))
+        self.skut10.setText(_translate("MainWindow", "skutter 10", None))
+        self.skut8.setText(_translate("MainWindow", "skutter 8", None))
+        self.skutter_control_label.setText(_translate("MainWindow", "skutter Control", None))
         self.trans_time_label.setText(_translate("MainWindow", "Time (seconds)", None))
-        self.scut_update.setText(_translate("MainWindow", "Send Update", None))
-        self.scut_toggle.setText(_translate("MainWindow", "Select All/None", None))
+        self.skut_update.setText(_translate("MainWindow", "Send Update", None))
+        self.skut_toggle.setText(_translate("MainWindow", "Select All/None", None))
         self.wishing_label_5.setText(_translate("MainWindow", "TextLabel", None))
         self.wishing_label_4.setText(_translate("MainWindow", "TextLabel", None))
         self.wishing_well_label.setText(_translate("MainWindow", "Wishing Well", None))
