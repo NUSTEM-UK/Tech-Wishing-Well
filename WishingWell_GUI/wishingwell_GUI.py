@@ -1,16 +1,16 @@
-#############################################################################
-# This code outputs data from the GUI to the following MQTT topics on       #
-# 'localhost', port '1883'                                                  #
-#                                                                           #
-#   Topic/Subtopic                      Values                              #
-#   wishing/scutter_MAC_ADDRESS         bool True / False                   #
-#   Wishing/speed                       int 0 - 100                         #
-#   wishing/colour                      hex colour code                     #
-#   wishing/time                        int >= 0                            #
-#   wishing/transition                  wheel / fade                        #
-#   wishing/direction                   forwards / reverse                  #
-#                                                                           #
-#############################################################################
+##############################################################################
+# This code outputs data from the GUI to the following MQTT topics on        #
+# 'localhost', port '1883'                                                   #
+#                                                                            #
+#   Topic/Subtopic                      Values                               #
+#   wishing/scutter_MAC_ADDRESS         bool True / False                    #
+#   Wishing/speed                       int 0 - 100                          #
+#   wishing/colour                      hex colour code                      #
+#   wishing/time                        int >= 0                             #
+#   wishing/transition                  wheel / fade                         #
+#   wishing/direction                   forwards / reverse                   #
+#                                                                            #
+##############################################################################
 
 from PyQt4 import QtCore, QtGui
 import paho.mqtt.client as mqtt
@@ -19,7 +19,15 @@ import paho.mqtt.client as mqtt
 import matplotlib.colors as colors
 import colorsys
 
+# These next lines of code will eventually allow for easier input of MQTT server location and port
+# they are not yet connected to any functions within the code
+# host = 'locahost'
+# port = 1883
+# client_label = 'python_pub'   # this provides a reference on the MQTT server as to which entity published the data, in our case the GUI
+
 checkbox_status = True
+
+# unsure what this bit does, but if you take it out... codey no worky.
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -37,6 +45,9 @@ except AttributeError:
 
 class Ui_MainWindow(object):
     
+    # lines 51 - 269 are concerned with setting out the layout of the window and the 
+    # various QObjects held within it, useful code with which to change inputs and outputs can
+    # be found from line 274 onwards
     
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
@@ -259,6 +270,7 @@ class Ui_MainWindow(object):
         self.anticlockwise.setObjectName(_fromUtf8("anticlockwise"))
         self.left_grid_layout.addWidget(self.anticlockwise, 9, 0, 1, 1)
         self.retranslateUi(MainWindow)
+        
         QtCore.QObject.connect(self.servo_dial, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), self.servo_display.display)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
