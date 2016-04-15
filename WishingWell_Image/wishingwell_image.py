@@ -21,9 +21,9 @@ composite = Image.frombytes('RGB', size, "\x00" * width * height * 3)
 composite = composite.convert('RGBA')
 
 # Video settings, culled from example code (mostly not used - TODO cleanup)
-video_framerate = 45
-shutter_max = (1.0/45) * 1000000  # microsec exposure for shutter setting
-shutter_min = 1000              # microsec expusre for shutter setting
+video_framerate = 8
+shutter_max = (1.0/video_framerate) * 1000000  # microsec exposure for shutter setting
+shutter_min = 1000              			   # microsec exposure for shutter setting
 print shutter_min, shutter_max
 video_rotation = 180
 video_port = False
