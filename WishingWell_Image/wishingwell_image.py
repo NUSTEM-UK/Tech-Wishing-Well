@@ -26,7 +26,7 @@ shutter_max = (1.0/video_framerate) * 1000000  # microsec exposure for shutter s
 shutter_min = 1000              			   # microsec exposure for shutter setting
 print shutter_min, shutter_max
 video_rotation = 180
-video_port = False
+video_port = True
 video_stabilization = False
 video_annotate_background = False
 video_annotate_frame_num = False
