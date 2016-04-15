@@ -34,8 +34,8 @@ perform_snapshot_capture = False
 snapshot_capture_filename = "snapshot"
 
 # Runtime variables
-threshold_low = 40
-threshold_high = 255
+threshold_low = 60
+threshold_high = 250
 frame_count = 1
 output_mode = 1
 
