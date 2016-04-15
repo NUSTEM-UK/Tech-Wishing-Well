@@ -21,7 +21,7 @@ composite = Image.frombytes('RGB', size, "\x00" * width * height * 3)
 composite = composite.convert('RGBA')
 
 # Video settings, culled from example code (mostly not used - TODO cleanup)
-video_framerate = 8
+video_framerate = 5
 shutter_max = (1.0/video_framerate) * 1000000  # microsec exposure for shutter setting
 shutter_min = 1000              			   # microsec exposure for shutter setting
 print shutter_min, shutter_max
@@ -34,8 +34,8 @@ perform_snapshot_capture = False
 snapshot_capture_filename = "snapshot"
 
 # Runtime variables
-threshold_low = 40
-threshold_high = 255
+threshold_low = 60
+threshold_high = 250
 frame_count = 1
 output_mode = 1
 
@@ -74,7 +74,7 @@ with picamera.PiCamera() as camera:
     camera.iso = 100
     camera.start_preview()
     # Wait for automatic gain control to settle
-    time.sleep(4)
+    time.sleep(3)
     # Now fix the values
     camera.shutter_speed = camera.exposure_speed
     brightness = camera.brightness
@@ -163,18 +163,21 @@ with picamera.PiCamera() as camera:
                         composite = composite.convert('RGBA')
     
         with Timer() as t1:
-            with picamera.array.PiYUVArray(camera, size=(width, height)) as stream:
+            with picamera.array.PiRGBArray(camera, size=(width, height)) as stream:
                 stream.truncate(0) # Nuke the existing stream and repopulate for new frame
-                camera.capture(stream, 'yuv', use_video_port=video_port) # Capture YUV data to stream object
-                print "Frame %s captured" % frame_count
-                with Timer() as t_yuv:
-					y = stream.array[0:width,0:height,0] # Get just the y component as a numpy array
-					frame = Image.fromarray(stream.array, "YCbCr") # Grab the YUV data into a Pillow YCbCr image
-                #~ print "==> Frame captured to YUV in %s s" % t_yuv.secs
-                with Timer() as t_convertRGB:
-					frame = frame.convert("RGB") # Use Pillow to convert YUV to RGB (PiCamera conversion appears to be borked, as of PiCamera 1.1)
-                #~ print "==> Frame converted to RGB in %s s" % t_convertRGB.secs
-        #~ print "=> Frame capture complete in %s s" % t1.secs
+                with Timer() as t_capture:
+                    camera.capture(stream, 'rgb', use_video_port=video_port) # Capture YUV data to stream object
+                    print "Frame %s captured" % frame_count
+                print "==> Frame capture in %s s" % t_capture.secs
+                with Timer() as t_rgb:
+                    frame = Image.fromarray(stream.array, "RGB") # Grab the YUV data into a Pillow YCbCr image
+                print "==> Frame from array to RGB in %s s" % t_rgb.secs
+                with Timer() as t_convertYUV:
+                    frameyuv = frame.convert("YCbCr")
+                    frameyuv_array = np.array(frameyuv)
+                    y = frameyuv_array[0:width,0:height,0] # Get just the y component as a numpy array
+                print "==> YUV conversion & Y extraction in %s s" % t_convertYUV.secs
+        print "=> Frame capture complete in %s s" % t1.secs
     
         # Output overall brightness calculation. Later, we'll use this to 
         # Handle flash frame discrimination
