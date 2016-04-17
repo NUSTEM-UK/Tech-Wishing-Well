@@ -72,11 +72,87 @@ def transparentify(image, threshold):
     image.putdata(newData)
     return image
 
+<<<<<<< HEAD
+=======
+def handlePygameEvents():
+    for event in pygame.event.get():
+            if event.type == pygame.QUIT: sys.exit()
+            elif event.type is pygame.KEYDOWN:
+                key_press = pygame.key.name(event.key)
+                print key_press
+                if key_press is "s":
+                    camera.shutter_speed -= 1000
+                    if camera.shutter_speed < shutter_min:
+                        camera.shutter_speed = shutter_min
+                    print "Shutter speed set to: %s" % camera.shutter_speed
+                elif key_press is "w":
+                    camera.shutter_speed += 1000
+                    if camera.shutter_speed > shutter_max:
+                        camera.shutter_speed = shutter_max
+                    print "Shutter speed set to: %s" % camera.shutter_speed
+                elif key_press is "e":
+                    threshold_low += 1
+                    if threshold_low > 255:
+                        threshold_low = 255
+                    print "threshold_low set to %i" % threshold_low
+                elif key_press is "d":
+                    threshold_low -= 1
+                    if threshold_low < 0:
+                        threshold_low = 0
+                    print "threshold_low set to %i" % threshold_low
+                elif key_press is "r":
+                    threshold_high += 1
+                    if threshold_high > 255:
+                        threshold_high = 255
+                    print "threshold_high set to %i" % threshold_high
+                elif key_press is "f":
+                    threshold_high -= 1
+                    if threshold_high < 0:
+                        threshold_high = 0
+                    print "threshold_high set to %i" % threshold_high
+                elif key_press is "m":
+                    # Toggle output mode
+                    output_mode += 1
+                    if output_mode > 3:
+                        output_mode = 1
+                    
+                # Check for left shift and allow rapid threshold changes
+                if pygame.key.get_mods() & pygame.KMOD_LSHIFT:
+                    if key_press is "q":
+                            sys.exit()
+                    if key_press is "e":
+                        threshold_low += 10
+                        if threshold_low > 255:
+                            threshold_low = 255
+                        print "threshold_low set to %i" % threshold_low
+                    elif key_press is "d":
+                        threshold_low -= 10
+                        if threshold_low < 0:
+                            threshold_low = 0
+                        print "threshold_low set to %i" % threshold_low
+                    elif key_press is "r":
+                        threshold_high += 10
+                        if threshold_high > 255:
+                            threshold_high = 255
+                        print "threshold_high set to %i" % threshold_high
+                    elif key_press is "f":
+                        threshold_high -= 10
+                        if threshold_high < 0:
+                            threshold_high = 0
+                        print "threshold_high set to %i" % threshold_high
+                    # Check for SHIFT+P and if found, set working image to pure black again
+                    elif key_press is "p":
+                        print "*** STARTING OVER ***"
+                        composite = Image.frombytes('RGB', size, "\x00" * width * height * 3)
+                        composite = composite.convert('RGBA')
+
+>>>>>>> master
 def get_brightness(image):
     """Return overall brightness value for image"""
     stat = ImageStat.Stat(image)
     return stat.rms[0]
 
+<<<<<<< HEAD
 
 def handlePygameEvents():
     global threshold_low
@@ -154,6 +230,8 @@ def handlePygameEvents():
                 composite = Image.frombytes('RGB', size, "\x00" * width * height * 3)
                 composite = composite.convert('RGBA')
 
+=======
+>>>>>>> master
 with picamera.PiCamera() as camera:
     camera.resolution = (width, height)
     camera.framerate = video_framerate
@@ -181,7 +259,36 @@ with picamera.PiCamera() as camera:
     print "White Balance (red, blue): %s" % (white_balance,) # comma is weird tuple munging thing
     print "Camera Brightness: %s" % brightness
 
+<<<<<<< HEAD
     # Now loop, within context of this camera object so we don't have to re-initialise
+=======
+    # Now loop, within context of this camera object. Ooh.
+    
+    while 1:
+        # Handle PyGame events (ie. keypress controls)
+        handlePygameEvents()
+    
+        with Timer() as t1:
+            with picamera.array.PiRGBArray(camera, size=(width, height)) as stream:
+                stream.truncate(0) # Nuke the existing stream and repopulate for new frame
+                with Timer() as t_capture:
+                    camera.capture(stream, 'rgb', use_video_port=video_port) # Capture YUV data to stream object
+                    print "Frame %s captured" % frame_count
+                print "==> Frame capture in %s s" % t_capture.secs
+                with Timer() as t_rgb:
+                    frame = Image.fromarray(stream.array, "RGB") # Grab the YUV data into a Pillow YCbCr image
+                print "==> Frame from array to RGB in %s s" % t_rgb.secs
+                with Timer() as t_convertYUV:
+                    frameyuv = frame.convert("YCbCr")
+                    frameyuv_array = np.array(frameyuv)
+                    y = frameyuv_array[0:width,0:height,0] # Get just the y component as a numpy array
+                print "==> YUV conversion & Y extraction in %s s" % t_convertYUV.secs
+        print "=> Frame capture complete in %s s" % t1.secs
+    
+        # Output overall brightness calculation. Later, we'll use this to 
+        # Handle flash frame discrimination
+        print "frame brightness: %d" % (get_brightness(frame))
+>>>>>>> master
     
     # MAIN LOOP START
     with picamera.PiCameraCircularIO(camera, seconds=2) as stream:
