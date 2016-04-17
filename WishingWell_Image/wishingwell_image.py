@@ -57,43 +57,8 @@ def transparentify(image, threshold):
     image.putdata(newData)
     return image
 
-def get_brightness(image):
-    """Return overall brightness value for image"""
-    stat = ImageStat.Stat(image)
-    return stat.rms[0]
-
-with picamera.PiCamera() as camera:
-    camera.resolution = (width, height)
-    camera.framerate = video_framerate
-    # camera.rotation = video_rotation
-    camera.video_stabilization = video_stabilization
-    # camera.annotate_background = video_annotate_background
-    # camera.annotate_frame_num = video_annotate_frame_num
-    
-    # Run the camera to capture initial exposure values
-    camera.iso = 100
-    camera.start_preview()
-    # Wait for automatic gain control to settle
-    time.sleep(3)
-    # Now fix the values
-    camera.shutter_speed = camera.exposure_speed
-    brightness = camera.brightness
-    camera.exposure_mode = 'off'
-    white_balance = camera.awb_gains
-    camera.awb_mode = 'off'
-    camera.awb_gains = white_balance
-    camera.stop_preview()
-
-    # Output camera parameters for debugging purposes
-    print "Shutter speed %s" % camera.shutter_speed
-    print "White Balance (red, blue): %s" % (white_balance,) # comma is weird tuple munging thing
-    print "Camera Brightness: %s" % brightness
-
-    # Now loop, within context of this camera object. Ooh.
-    
-    while 1:
-        # Handle PyGame events (ie. keypress controls)
-        for event in pygame.event.get():
+def handlePygameEvents():
+    for event in pygame.event.get():
             if event.type == pygame.QUIT: sys.exit()
             elif event.type is pygame.KEYDOWN:
                 key_press = pygame.key.name(event.key)
@@ -136,6 +101,8 @@ with picamera.PiCamera() as camera:
                     
                 # Check for left shift and allow rapid threshold changes
                 if pygame.key.get_mods() & pygame.KMOD_LSHIFT:
+                    if key_press is "q":
+                            sys.exit()
                     if key_press is "e":
                         threshold_low += 10
                         if threshold_low > 255:
@@ -161,6 +128,44 @@ with picamera.PiCamera() as camera:
                         print "*** STARTING OVER ***"
                         composite = Image.frombytes('RGB', size, "\x00" * width * height * 3)
                         composite = composite.convert('RGBA')
+
+def get_brightness(image):
+    """Return overall brightness value for image"""
+    stat = ImageStat.Stat(image)
+    return stat.rms[0]
+
+with picamera.PiCamera() as camera:
+    camera.resolution = (width, height)
+    camera.framerate = video_framerate
+    # camera.rotation = video_rotation
+    camera.video_stabilization = video_stabilization
+    # camera.annotate_background = video_annotate_background
+    # camera.annotate_frame_num = video_annotate_frame_num
+    
+    # Run the camera to capture initial exposure values
+    camera.iso = 100
+    camera.start_preview()
+    # Wait for automatic gain control to settle
+    time.sleep(3)
+    # Now fix the values
+    camera.shutter_speed = camera.exposure_speed
+    brightness = camera.brightness
+    camera.exposure_mode = 'off'
+    white_balance = camera.awb_gains
+    camera.awb_mode = 'off'
+    camera.awb_gains = white_balance
+    camera.stop_preview()
+
+    # Output camera parameters for debugging purposes
+    print "Shutter speed %s" % camera.shutter_speed
+    print "White Balance (red, blue): %s" % (white_balance,) # comma is weird tuple munging thing
+    print "Camera Brightness: %s" % brightness
+
+    # Now loop, within context of this camera object. Ooh.
+    
+    while 1:
+        # Handle PyGame events (ie. keypress controls)
+        handlePygameEvents()
     
         with Timer() as t1:
             with picamera.array.PiRGBArray(camera, size=(width, height)) as stream:
