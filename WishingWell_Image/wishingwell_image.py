@@ -9,7 +9,7 @@ import numpy as np
 pygame.init()
 
 # Set working frame size
-size = width, height = 720, 720
+size = width, height = 1024, 1024
 
 # Initialise PyGame surface
 screen = pygame.display.set_mode(size)
@@ -26,7 +26,7 @@ shutter_max = (1.0/video_framerate) * 1000000  # microsec exposure for shutter s
 shutter_min = 1000              			   # microsec exposure for shutter setting
 print shutter_min, shutter_max
 video_rotation = 180
-video_port = False
+video_port = True
 video_stabilization = False
 video_annotate_background = False
 video_annotate_frame_num = False
@@ -162,89 +162,84 @@ with picamera.PiCamera() as camera:
     print "Camera Brightness: %s" % brightness
 
     # Now loop, within context of this camera object. Ooh.
-    
-    while 1:
-        # Handle PyGame events (ie. keypress controls)
-        handlePygameEvents()
-    
-        with Timer() as t1:
-            with picamera.array.PiRGBArray(camera, size=(width, height)) as stream:
-                stream.truncate(0) # Nuke the existing stream and repopulate for new frame
-                with Timer() as t_capture:
-                    camera.capture(stream, 'rgb', use_video_port=video_port) # Capture YUV data to stream object
-                    print "Frame %s captured" % frame_count
-                print "==> Frame capture in %s s" % t_capture.secs
-                with Timer() as t_rgb:
-                    frame = Image.fromarray(stream.array, "RGB") # Grab the YUV data into a Pillow YCbCr image
-                print "==> Frame from array to RGB in %s s" % t_rgb.secs
-                with Timer() as t_convertYUV:
-                    frameyuv = frame.convert("YCbCr")
-                    frameyuv_array = np.array(frameyuv)
-                    y = frameyuv_array[0:width,0:height,0] # Get just the y component as a numpy array
-                print "==> YUV conversion & Y extraction in %s s" % t_convertYUV.secs
-        print "=> Frame capture complete in %s s" % t1.secs
-    
-        # Output overall brightness calculation. Later, we'll use this to 
-        # Handle flash frame discrimination
-        print "frame brightness: %d" % (get_brightness(frame))
-    
-        # with Timer() as t2:
-    	    # frame = transparentify(frame, threshold)
-        # print "=> Frame transparentified in %s s" % t2.secs
-    
-        with Timer() as t2a:
-			#~ mask = Image.fromarray(y, "L")
-			#~ mask.save("mask-before.jpeg")
-			#~ print "MAX MASK VALUE: %s" % np.amax(y)
-			#~ print "MIN MASK VALUE: %s" % np.amin(y)
 
-			# Index Y array for values below threshold_low
-            low_clip_indices = y < threshold_low
-            # Set values at those indices to zero (ie. transparent)
-            y[low_clip_indices] = 0
-            # Index y array for values above threshold_high
-            high_clip_indices = y > threshold_high
-            # Set values at those indices to 255 (ie. solid)
-            y[high_clip_indices] = 255
-            #~ y_clip = np.clip(y, 0, threshold)
-            #~ print "POST-CLIP MAX MASK VALUE: %s" % np.amax(y)
-            #~ print "POST-CLIP MIN MASK VALUE: %s" % np.amin(y)
-            # Make mask image from Numpy array y
-            mask = Image.fromarray(y, "L")
-            #~ mask.save("mask-after.jpeg")
-        #~ print "=> Clip processing %s s" %t2a.secs
+    with picamera.array.PiRGBArray(camera, size=(width, height)) as stream:
+        while 1:
+            # Handle PyGame events (ie. keypress controls)
+            handlePygameEvents()
+            with Timer() as t_capture:
+                camera.capture(stream, 'rgb', use_video_port=video_port) # Capture RGB data to stream object
+                print "Frame %s captured" % frame_count
+            print "==> Frame capture in %s s" % t_capture.secs
+            with Timer() as t_rgb:
+                frame = Image.fromarray(stream.array, "RGB") # Grab the RGB data into a Pillow RGB image
+            print "==> Frame from array to RGB in %s s" % t_rgb.secs
+            with Timer() as t_convertYUV:
+                frameyuv = frame.convert("YCbCr")
+                frameyuv_array = np.array(frameyuv)
+                y = frameyuv_array[0:width,0:height,0] # Get just the y component as a numpy array
+            print "==> YUV conversion & Y extraction in %s s" % t_convertYUV.secs
+            stream.truncate(0) # Nuke the existing stream to allow for repopulation
     
-        with Timer() as t3:
-            # Convert captured frame to RGBA
-            frame = frame.convert("RGBA")
-            #~ print frame.format, frame.size
-            #~ print mask.format, mask.size
-            # Combine captured frame with rolling composite, via computed mask
-    	    composite.paste(frame, (0,0), mask)
-        #~ print "=> Frame composited in %s s" % t3.secs
+            # Output overall brightness calculation. Later, we'll use this to 
+            # Handle flash frame discrimination
+            print "frame brightness: %d" % (get_brightness(frame))
+        
+            # with Timer() as t2:
+        	    # frame = transparentify(frame, threshold)
+            # print "=> Frame transparentified in %s s" % t2.secs
+        
+            with Timer() as t2a:
+    			#~ mask = Image.fromarray(y, "L")
+    			#~ mask.save("mask-before.jpeg")
+    			#~ print "MAX MASK VALUE: %s" % np.amax(y)
+    			#~ print "MIN MASK VALUE: %s" % np.amin(y)
+
+    			# Index Y array for values below threshold_low
+                low_clip_indices = y < threshold_low
+                # Set values at those indices to zero (ie. transparent)
+                y[low_clip_indices] = 0
+                # Index y array for values above threshold_high
+                high_clip_indices = y > threshold_high
+                # Set values at those indices to 255 (ie. solid)
+                y[high_clip_indices] = 255
+                #~ y_clip = np.clip(y, 0, threshold)
+                #~ print "POST-CLIP MAX MASK VALUE: %s" % np.amax(y)
+                #~ print "POST-CLIP MIN MASK VALUE: %s" % np.amin(y)
+                # Make mask image from Numpy array y
+                mask = Image.fromarray(y, "L")
+                #~ mask.save("mask-after.jpeg")
+            #~ print "=> Clip processing %s s" %t2a.secs
     
-        # Prepare the PyGame surface
-        # Need to convert PIL image to string representation, then string to PyGame image. Ugh.
-        # Mode switching doesn't work for now, but the stub is here.
-        if output_mode is 1:
-            # Default mode: display composite
-            raw_str = composite.tostring("raw", 'RGBA')
-            pygame_surface = pygame.image.fromstring(raw_str, size, 'RGBA')
-        elif output_mode is 2:
-            # Display mask only. Doesn't work.
-            raw_str = mask.tostring("raw", 'L')
-            pygame.surface = pygame.image.fromstring(raw_str, size, 'P')
-        elif output_mode is 3:
-            # Display raw image (no composite). Doesn't work.
-            raw_str = frame.tostring("raw", 'RGBA')
-            pygame.surface = pygame.image.fromstring(raw_str, size, 'RGBA')
+            with Timer() as t3:
+                # Convert captured frame to RGBA
+                frame = frame.convert("RGBA")
+                #~ print frame.format, frame.size
+                #~ print mask.format, mask.size
+                # Combine captured frame with rolling composite, via computed mask
+                composite.paste(frame, (0,0), mask)
+            #~ print "=> Frame composited in %s s" % t3.secs
         
-        # Finally, update the window
-        screen.blit(pygame_surface, (0,0))
-        pygame.display.flip()
+            # Prepare the PyGame surface
+            # Need to convert PIL image to string representation, then string to PyGame image. Ugh.
+            # Mode switching doesn't work for now, but the stub is here.
+            if output_mode is 1:
+                # Default mode: display composite
+                raw_str = composite.tostring("raw", 'RGBA')
+                pygame_surface = pygame.image.fromstring(raw_str, size, 'RGBA')
+            elif output_mode is 2:
+                # Display mask only. Doesn't work.
+                raw_str = mask.tostring("raw", 'L')
+                pygame.surface = pygame.image.fromstring(raw_str, size, 'P')
+            elif output_mode is 3:
+                # Display raw image (no composite). Doesn't work.
+                raw_str = frame.tostring("raw", 'RGBA')
+                pygame.surface = pygame.image.fromstring(raw_str, size, 'RGBA')
         
-        frame.close() # release the file handle. Should avoid the memory leak?
-        # (I don't think there is a memory leak any more, but I daren't remove this without testing)
-        frame_count += 1
-        # and around we go again.
+            # Finally, update the window
+            screen.blit(pygame_surface, (0,0))
+            pygame.display.flip()
+        
+            frame_count += 1
+            # and around we go again.
     
