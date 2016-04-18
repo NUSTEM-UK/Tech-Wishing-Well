@@ -1,2 +1,2 @@
 # Tech-Wishing-Well
-The Think Physics Technology Wishing Well showcased at Marker Faire UK 2016
+The Think Physics Technology Wishing Well [to be] showcased at Maker Faire UK 2016, April 23rd & 24th, Centre for Life, Newcastle.
