@@ -35,10 +35,11 @@ newest_file = ""
 
 for name in files:
     st = os.stat(name)
-    if st[ST_MTIME] > newest_value:
-            newest_value = st[ST_MTIME]
+    if st[ST_MTIME] > newfile_timestamp:
+            newfile_timestamp = st[ST_MTIME]
             #newest_file = name
             
+print newfile_timestamp           
 
 
 # this is the button debounce function
@@ -63,7 +64,7 @@ tweet2 = "This is the third Tweet"
 # write any twitter handles we want to include here
 twit_message = tweet0
 
-# create and rotate the PiCamera
+#create and rotate the PiCamera
 camera = picamera.PiCamera()
 camera.rotation = 270
 camera.start_preview()
@@ -71,17 +72,20 @@ camera.start_preview()
 
 try:
     while True:
-        try:
-            files = glob.glob('/home/pi/Maker_Faire_2016/Outputs/*.jpeg')
-            for name in files:
-                st = os.stat(name)
-                if st[ST_MTIME] > newest_value:
-                    newest_value = st[ST_MTIME]
-                    newest_file = name
-                    photo = open(newest_file, 'rb')
-                    response = twitter.upload_media(media = photo)
-                    twitter.update_status(status = "This bit of the code works!", media_ids=[response['media_id']])
-                    photo.close()
+        
+        files = glob.glob('/home/pi/Maker_Faire_2016/Outputs/*.jpeg')
+        for name in files:
+            st = os.stat(name)
+            if st[ST_MTIME] > newfile_timestamp:
+                newfile_timestamp = st[ST_MTIME]
+                newest_file = name
+                print newfile_timestamp
+                print newest_file
+                photo = open(newest_file, 'rb')
+                response = twitter.upload_media(media = photo)
+                twitter.update_status(status = "This bit of the code works!", media_ids=[response['media_id']])
+                photo.close()
+        
             
         if GPIO.input(select_btn) == False:
             if tweet_choice == 0:
