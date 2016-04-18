@@ -48,28 +48,10 @@ perform_snapshot_capture = False
 snapshot_capture_filename = "snapshot"
 
 # Runtime variables
-threshold_low = 60
-threshold_high = 250
+threshold_low = 120
+threshold_high = 160
 frame_count = 1
 output_mode = 1
-
-# Original transparency mask code: very slow, nasty edges but works well enough.
-# No longer called in current version
-def transparentify(image, threshold):
-    """docstring for transparentify"""
-    # With thanks to:
-    # http://stackoverflow.com/questions/765736/using-pil-to-make-all-white-pixels-transparent
-	# This is the original algorithm, which is rather slow; steps through all of R,G,B values
-	# to compute mask, all done in PIL. Numpy version is ~60x faster.
-    data = image.getdata()
-    newData = list()
-    for item in data:
-        if item[0] < threshold and item[1] < threshold and item[2] < threshold:
-            newData.append((0, 0, 0, 0))
-        else:
-            newData.append(item)
-    image.putdata(newData)
-    return image
 
 def get_brightness(image):
     """Return overall brightness value for image"""
@@ -85,7 +67,7 @@ def handlePygameEvents():
         if event.type == pygame.QUIT: sys.exit()
         elif event.type is pygame.KEYDOWN:
             key_press = pygame.key.name(event.key)
-            print key_press
+            # print key_press # For diagnostic purposes, but messes up output
             if key_press is "s":
                 camera.shutter_speed -= 1000
                 if camera.shutter_speed < shutter_min:
@@ -146,6 +128,14 @@ def handlePygameEvents():
                     if threshold_high < 0:
                         threshold_high = 0
                     print "threshold_high set to %i" % threshold_high
+                elif key_press is "s":
+                    if (camera.shutter_speed - 10000) > shutter_min:
+                        camera.shutter_speed -= 10000
+                    print "Shutter speed set to: %s" % camera.shutter_speed
+                elif key_press is "w":
+                    if (camera.shutter_speed + 10000) < shutter_max:
+                        camera.shutter_speed += 10000
+                    print "Shutter speed set to: %s" % camera.shutter_speed
                 # Check for SHIFT+P and if found, set working image to pure black again
                 elif key_press is "p":
                     print "*** STARTING OVER ***"
@@ -190,6 +180,7 @@ with picamera.PiCamera() as camera:
         camera.wait_recording(1)
         print "1-SECOND BUFFER RECORDED"
         try:
+            time_begin = time.time()
             while True:
                 time_start = time.time()
                 # Handle PyGame events (ie. keypress controls)
@@ -206,8 +197,6 @@ with picamera.PiCamera() as camera:
                         break # we only want the first frame from the buffer
                 # stream.clear() # Reset the circular stream, so we never see this image again
 
-                time_capture = time.time() - time_start
-                print "Capture complete in %.3f secs" % time_capture
                 # We have our frame, so we've unlocked the circularIO stream,
                 # which merrily continues recording in the background.
                 # (via unicorns or threads or similar magic)
@@ -217,16 +206,10 @@ with picamera.PiCamera() as camera:
                 frame_yuv = frame_new.convert("YCbCr")
                 frame_yuv_array = np.array(frame_yuv)
                 frame_y = frame_yuv_array[0:width, 0:height, 0]
-            
-                time_yuv = time.time() - time_capture
-                print "YUV processing complete in %.3f secs" % time_yuv
 
                 # Output overall brightness calculation. Later, we'll use this to 
                 # Handle flash frame discrimination
                 frame_brightness = get_brightness(frame_new)
-                
-                time_brightness = time.time() - time_yuv
-                print "Brightness calculation complete in %.3f secs" % time_brightness
 
     			#~ mask = Image.fromarray(frame_y, "L")
     			#~ mask.save("mask-before.jpeg")
@@ -244,18 +227,11 @@ with picamera.PiCamera() as camera:
                 # ...then set values at those indices to 255
                 frame_y[high_clip_indices] = 255
                 
-                time_mask = time.time() - time_brightness
-                print "Mask processing complete in %.3f secs" % time_brightness
-
                 # Make mask image from Numpy array frame_y
                 mask = Image.fromarray(frame_y, "L")
                 # mask.save("mask-after.jpeg")
-    
-                time_maskImage = time.time() - time_mask
-                print "Mask image generation complete in %.3f secs" % time_maskImage
 
                 # ***** COMPOSITE NEW FRAME *****
-
                 # Convert captured frame to RGBA
                 frame_new = frame_new.convert("RGBA")
                 
@@ -263,11 +239,7 @@ with picamera.PiCamera() as camera:
                 # TODO: Check this is really doing what we think it is
                 composite.paste(frame_new, (0,0), mask)
 
-                time_composite = time.time() - time_maskImage
-                print "Compositing complete in %.3f secs" % time_composite
-
-                # ***** DISPLAY NEW FRAME *****
-    
+                # ***** DISPLAY NEW FRAME *****    
                 # Prepare the PyGame surface
                 # Need to convert PIL image to string representation, then string to PyGame image. Ugh.
                 # Mode switching doesn't work for now, but the stub is here.
@@ -285,20 +257,14 @@ with picamera.PiCamera() as camera:
                     raw_str = frame.tostring("raw", 'RGBA')
                     pygame.surface = pygame.image.fromstring(raw_str, size, 'RGBA')
                 
-                time_surface = time.time() - time_composite
-                print "Surface preparation complete in %.3f secs" % time_surface
-
                 # Finally, update the window
                 screen.blit(pygame_surface, (0,0))
                 pygame.display.flip()
                 
-                time_blit = time.time() - time_surface
-                print "Blit done in %.3f secs" % time_blit
-
-                time_taken = time.time() - time_start
-                print "Frame %d processed in %.3f secs, at %.2f fps" % (frame_count, time_taken, (1/time_taken))
-                print "========================================="
                 frame_count += 1
+                time_taken = time.time() - time_start
+                time_since_begin = time.time() - time_begin
+                print "Frame %d in %.3f secs, at %.2f fps: shutter: %d, low: %d high: %d" % (frame_count, time_taken, (frame_count/time_since_begin), camera.shutter_speed, threshold_low, threshold_high)
                 # and around we go again.
 
         finally:
