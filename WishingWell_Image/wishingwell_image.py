@@ -13,8 +13,6 @@ import picamera.array
 from PIL import Image, ImageStat
 import numpy as np
 
-pygame.init()
-
 # Set working frame size (multiples of 32h, 16v -- or padded to these)
 # But we're not doing the post-crop, so... stick with %32 sizes
 size = width, height = 736, 736
@@ -23,16 +21,8 @@ size = width, height = 736, 736
 # frame_height = (height + 15) // 16 * 16
 # framesize = frame_width * frame_height * 3 # for RGB (YUV is funky here, 4:2:0 sampled -- see docs)
 
-# Initialise PyGame surface
-screen = pygame.display.set_mode(size)
-screen.fill((0, 0, 0))
-pygame.display.flip()
-
-# Initialise PIL image to black background
-composite = Image.frombytes('RGB', size, "\x00" * width * height * 3)
-composite = composite.convert('RGBA')
-raw_str = composite.tostring("raw", 'RGBA')
-pygame_surface = pygame.image.fromstring(raw_str, size, 'RGBA')
+# How often should we output a frame to disk?
+framedump_interval = 1000
 
 # Video settings, culled from example code (mostly not used - TODO cleanup)
 video_framerate = 4
@@ -53,6 +43,18 @@ threshold_high = 160
 frame_count = 1
 output_mode = 1
 
+# Initialise PyGame surface
+pygame.init()
+screen = pygame.display.set_mode(size)
+screen.fill((0, 0, 0))
+pygame.display.flip()
+
+# Initialise PIL image to black background
+composite = Image.frombytes('RGB', size, "\x00" * width * height * 3)
+composite = composite.convert('RGBA')
+raw_str = composite.tostring("raw", 'RGBA')
+pygame_surface = pygame.image.fromstring(raw_str, size, 'RGBA')
+
 def get_brightness(image):
     """Return overall brightness value for image"""
     stat = ImageStat.Stat(image)
@@ -63,6 +65,7 @@ def handlePygameEvents():
     global threshold_high
     global output_mode
     global composite
+    global frame_count
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
         elif event.type is pygame.KEYDOWN:
@@ -103,6 +106,10 @@ def handlePygameEvents():
                 output_mode += 1
                 if output_mode > 3:
                     output_mode = 1
+            elif key_press is "o":
+                framedump_name = "frame-" + str(frame_count) + ".jpeg"
+                composite.save(framedump_name)
+                print "Frame saved as %s" % framedump_name
             
             # Check for left shift and allow rapid threshold changes
             if pygame.key.get_mods() & pygame.KMOD_LSHIFT:
@@ -175,10 +182,9 @@ with picamera.PiCamera() as camera:
     with picamera.PiCameraCircularIO(camera, seconds=1) as stream:
         # Pre-populare the camera buffer. Need a short buffer so it's always overflowing
         # (with a deep buffer we'll see the same first frame each time)
+        # (although we've a suspicion this isn't behaving as we think)
         camera.start_recording(stream, format='rgb')
-        print "CAMERA RECORDING"
         camera.wait_recording(1)
-        print "1-SECOND BUFFER RECORDED"
         try:
             time_begin = time.time()
             while True:
@@ -265,6 +271,12 @@ with picamera.PiCamera() as camera:
                 time_taken = time.time() - time_start
                 time_since_begin = time.time() - time_begin
                 print "Frame %d in %.3f secs, at %.2f fps: shutter: %d, low: %d high: %d" % (frame_count, time_taken, (frame_count/time_since_begin), camera.shutter_speed, threshold_low, threshold_high)
+                
+                if (frame_count % framedump_interval == 0):
+                    framedump_name = "frame-" + str(frame_count) + ".jpeg"
+                    composite.save(framedump_name)
+                    print "Frame saved as %s" % framedump_name
+                
                 # and around we go again.
 
         finally:
