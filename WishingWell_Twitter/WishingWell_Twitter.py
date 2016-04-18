@@ -82,7 +82,6 @@ try:
                     response = twitter.upload_media(media = photo)
                     twitter.update_status(status = "This bit of the code works!", media_ids=[response['media_id']])
                     photo.close()
-                    debounce()
             
         if GPIO.input(select_btn) == False:
             if tweet_choice == 0:
