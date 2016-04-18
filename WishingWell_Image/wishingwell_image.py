@@ -11,7 +11,6 @@ import pygame
 import picamera
 import picamera.array
 from PIL import Image, ImageStat
-from timer import Timer
 import numpy as np
 
 pygame.init()
