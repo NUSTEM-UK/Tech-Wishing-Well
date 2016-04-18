@@ -5,7 +5,7 @@ import paho.mqtt.client as mqtt
 import matplotlib.colors as colors
 import colorsys
 
-checkbox_status = True
+checkbox_status = False
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
