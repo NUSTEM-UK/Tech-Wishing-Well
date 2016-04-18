@@ -1,8 +1,12 @@
 # Import the necessary module: GPIO, Twython, Tim and PiCamera
 import RPi.GPIO as GPIO
-import time
+import os, time
 from twython import Twython
 import picamera
+
+# these modules allow us to import data on the image files to be tweeted on the hour
+from stat import *
+import glob
 
 # set integers for the various buttons and LEDs
 select_btn = 17
@@ -23,6 +27,18 @@ GPIO.setup(b_LED, GPIO.OUT)
 config = {}
 execfile("real_config.py", config)
 twitter = Twython(config["app_key"],config["app_secret"],config["oauth_token"],config["oauth_token_secret"])
+
+# get the time stamp of the most recent jpeg in the output folder
+files = glob.glob('/home/pi/Maker_Faire_2016/Outputs/*.jpeg')
+newfile_timestamp = 0
+newest_file = ""
+
+for name in files:
+    st = os.stat(name)
+    if st[ST_MTIME] > newest_value:
+            newest_value = st[ST_MTIME]
+            #newest_file = name
+            
 
 
 # this is the button debounce function
@@ -55,6 +71,19 @@ camera.start_preview()
 
 try:
     while True:
+        try:
+            files = glob.glob('/home/pi/Maker_Faire_2016/Outputs/*.jpeg')
+            for name in files:
+                st = os.stat(name)
+                if st[ST_MTIME] > newest_value:
+                    newest_value = st[ST_MTIME]
+                    newest_file = name
+                    photo = open(newest_file, 'rb')
+                    response = twitter.upload_media(media = photo)
+                    twitter.update_status(status = "This bit of the code works!", media_ids=[response['media_id']])
+                    photo.close()
+                    debounce()
+            
         if GPIO.input(select_btn) == False:
             if tweet_choice == 0:
                 tweet_choice = 1
