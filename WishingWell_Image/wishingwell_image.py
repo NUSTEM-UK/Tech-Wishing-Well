@@ -36,12 +36,12 @@ raw_str = composite.tostring("raw", 'RGBA')
 pygame_surface = pygame.image.fromstring(raw_str, size, 'RGBA')
 
 # Video settings, culled from example code (mostly not used - TODO cleanup)
-video_framerate = 6
+video_framerate = 4
 shutter_max = (1.0/video_framerate) * 1000000  # microsec exposure for shutter setting
 shutter_min = 1000              			   # microsec exposure for shutter setting
 print shutter_min, shutter_max
 video_rotation = 180
-video_port = False
+video_port = True
 video_stabilization = False
 video_annotate_background = False
 video_annotate_frame_num = False
@@ -123,35 +123,35 @@ def handlePygameEvents():
                 if output_mode > 3:
                     output_mode = 1
             
-        # Check for left shift and allow rapid threshold changes
-        if pygame.key.get_mods() & pygame.KMOD_LSHIFT:
-            if key_press is "q":
-                sys.exit()
-            if key_press is "e":
-                threshold_low += 10
-                if threshold_low > 255:
-                    threshold_low = 255
-                print "threshold_low set to %i" % threshold_low
-            elif key_press is "d":
-                threshold_low -= 10
-                if threshold_low < 0:
-                    threshold_low = 0
-                print "threshold_low set to %i" % threshold_low
-            elif key_press is "r":
-                threshold_high += 10
-                if threshold_high > 255:
-                    threshold_high = 255
-                print "threshold_high set to %i" % threshold_high
-            elif key_press is "f":
-                threshold_high -= 10
-                if threshold_high < 0:
-                    threshold_high = 0
-                print "threshold_high set to %i" % threshold_high
-            # Check for SHIFT+P and if found, set working image to pure black again
-            elif key_press is "p":
-                print "*** STARTING OVER ***"
-                composite = Image.frombytes('RGB', size, "\x00" * width * height * 3)
-                composite = composite.convert('RGBA')
+            # Check for left shift and allow rapid threshold changes
+            if pygame.key.get_mods() & pygame.KMOD_LSHIFT:
+                if key_press is "q":
+                    sys.exit()
+                if key_press is "e":
+                    threshold_low += 10
+                    if threshold_low > 255:
+                        threshold_low = 255
+                    print "threshold_low set to %i" % threshold_low
+                elif key_press is "d":
+                    threshold_low -= 10
+                    if threshold_low < 0:
+                        threshold_low = 0
+                    print "threshold_low set to %i" % threshold_low
+                elif key_press is "r":
+                    threshold_high += 10
+                    if threshold_high > 255:
+                        threshold_high = 255
+                    print "threshold_high set to %i" % threshold_high
+                elif key_press is "f":
+                    threshold_high -= 10
+                    if threshold_high < 0:
+                        threshold_high = 0
+                    print "threshold_high set to %i" % threshold_high
+                # Check for SHIFT+P and if found, set working image to pure black again
+                elif key_press is "p":
+                    print "*** STARTING OVER ***"
+                    composite = Image.frombytes('RGB', size, "\x00" * width * height * 3)
+                    composite = composite.convert('RGBA')
 
 with picamera.PiCamera() as camera:
     camera.resolution = (width, height)
@@ -183,13 +183,13 @@ with picamera.PiCamera() as camera:
     # Now loop, within context of this camera object so we don't have to re-initialise
     
     # MAIN LOOP START
-    with picamera.PiCameraCircularIO(camera, seconds=2) as stream:
+    with picamera.PiCameraCircularIO(camera, seconds=1) as stream:
         # Pre-populare the camera buffer. Need a short buffer so it's always overflowing
         # (with a deep buffer we'll see the same first frame each time)
         camera.start_recording(stream, format='rgb')
         print "CAMERA RECORDING"
-        camera.wait_recording(2)
-        print "2-SECOND BUFFER RECORDED"
+        camera.wait_recording(1)
+        print "1-SECOND BUFFER RECORDED"
         try:
             while True:
                 time_start = time.time()
