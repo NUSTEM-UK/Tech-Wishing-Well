@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Image processing using CircularIO capture.
 # Gets us to 3fps at 736x736 resolution, with 6fps capture selected.
 # Profiling suggests peformance limits are now due to:
@@ -12,40 +14,58 @@ import picamera
 import picamera.array
 from PIL import Image, ImageStat, ImageOps, ImageDraw
 import numpy as np
+import os.path
+from sys import argv
+
+script, file_prefix = argv
 
 # Set working frame size (multiples of 32h, 16v -- or padded to these)
 # But we're not doing the post-crop, so... stick with %32 sizes
-size = width, height = 736, 736
-# frame size is queried directly from the CircularIO object
-# frame_width = (width + 31) // 32 * 32
-# frame_height = (height + 15) // 16 * 16
-# framesize = frame_width * frame_height * 3 # for RGB (YUV is funky here, 4:2:0 sampled -- see docs)
+# Good sizes are 736, 800, 864, 896, 928, 960, 1024, 1056
+# Best frame-rate compromise for a 1920x1080 display is probably 864 
+size = width, height = 864, 864
+# Should we display full screen, or windowed?
+full_screen = 0
 
-# How often should we output a frame to disk?
+# Video settings
+# Keep the video_framerate low to allow longer shutter speeds.
+# Also, faster shutter speeds slow the whole system down. It's not clear why.
+video_framerate = 3
+# Juggle these a little - need buffer to be full before we start processing
+# frames, so prerecord_seconds should not be shorter than buffer_length
+buffer_length = 2
+prerecord_seconds = 2
+
+# Set output directory for manual and automatic framedumps
+output_directory = "/home/pi/outputs"
+# How often should we automatically output a frame to disk?
 framedump_interval = 1000
 
-# Video settings, culled from example code (mostly not used - TODO cleanup)
-video_framerate = 4
+# Default image processing settings
+threshold_low = 120
+threshold_high = 160
+
+# ------------- END OF CONFIGURATION
+
+# Runtime variables, leftover configuration, etc.
+output_mode = 1
 shutter_max = (1.0/video_framerate) * 1000000  # microsec exposure for shutter setting
 shutter_min = 1000              			   # microsec exposure for shutter setting
-print shutter_min, shutter_max
 video_rotation = 180
 video_port = True
 video_stabilization = False
 video_annotate_background = False
 video_annotate_frame_num = False
-perform_snapshot_capture = False
-snapshot_capture_filename = "snapshot"
 
-# Runtime variables
-threshold_low = 120
-threshold_high = 160
 frame_count = 1
-output_mode = 1
 
 # Initialise PyGame surface
 pygame.init()
-screen = pygame.display.set_mode(size)
+if full_screen:
+    screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
+    pygame.mouse.set_visible(0)
+else:
+    screen = pygame.display.set_mode(size)
 screen.fill((0, 0, 0))
 pygame.display.flip()
 
@@ -81,6 +101,16 @@ def get_brightness(image):
     stat = ImageStat.Stat(image)
     return stat.rms[0]
 
+def framedump():
+    global file_prefix
+    global frame_count
+    global output_directory
+    global composite
+    framedump_name = file_prefix + "-frame-" + str(frame_count) + ".jpeg"
+    filename = os.path.join(output_directory, framedump_name)
+    composite.save(filename)
+    print "Frame saved as %s" % framedump_name
+
 def handlePygameEvents():
     global threshold_low
     global threshold_high
@@ -96,34 +126,28 @@ def handlePygameEvents():
             key_press = pygame.key.name(event.key)
             # print key_press # For diagnostic purposes, but messes up output
             if key_press is "s":
-                camera.shutter_speed -= 1000
-                if camera.shutter_speed < shutter_min:
-                    camera.shutter_speed = shutter_min
+                if (camera.shutter_speed - 1000) >= shutter_min:
+                    camera.shutter_speed -= 1000
                 print "Shutter speed set to: %s" % camera.shutter_speed
             elif key_press is "w":
-                camera.shutter_speed += 1000
-                if camera.shutter_speed > shutter_max:
-                    camera.shutter_speed = shutter_max
+                if (camera.shutter_speed + 1000) <= shutter_max:
+                    camera.shutter_speed += 1000
                 print "Shutter speed set to: %s" % camera.shutter_speed
             elif key_press is "e":
-                threshold_low += 1
-                if threshold_low > 255:
-                    threshold_low = 255
+                if (threshold_low + 1) < 256:
+                    threshold_low += 1
                 print "threshold_low set to %i" % threshold_low
             elif key_press is "d":
-                threshold_low -= 1
-                if threshold_low < 0:
-                    threshold_low = 0
+                if (threshold_low - 1) >= 0:
+                    threshold_low -= 1
                 print "threshold_low set to %i" % threshold_low
             elif key_press is "r":
-                threshold_high += 1
-                if threshold_high > 255:
-                    threshold_high = 255
+                if (threshold_high + 1) < 256:
+                    threshold_high += 1
                 print "threshold_high set to %i" % threshold_high
             elif key_press is "f":
-                threshold_high -= 1
-                if threshold_high < 0:
-                    threshold_high = 0
+                if (threshold_high -1) >= 0:
+                    threshold_high -= 1
                 print "threshold_high set to %i" % threshold_high
             elif key_press is "m":
                 # Toggle output mode
@@ -153,40 +177,34 @@ def handlePygameEvents():
                 overmask_radius -= 10
                 drawOvermask()
             elif key_press is "o":
-                framedump_name = "frame-" + str(frame_count) + ".jpeg"
-                composite.save(framedump_name)
-                print "Frame saved as %s" % framedump_name
+                framedump()
             
             # Check for left shift and allow rapid threshold changes
             if pygame.key.get_mods() & pygame.KMOD_LSHIFT:
                 if key_press is "q":
                     sys.exit()
                 if key_press is "e":
-                    threshold_low += 10
-                    if threshold_low > 255:
-                        threshold_low = 255
+                    if (threshold_low + 10) < 256:
+                        threshold_low += 10
                     print "threshold_low set to %i" % threshold_low
                 elif key_press is "d":
-                    threshold_low -= 10
-                    if threshold_low < 0:
-                        threshold_low = 0
+                    if (threshold_low - 10) >= 0:
+                        threshold_low -= 10
                     print "threshold_low set to %i" % threshold_low
                 elif key_press is "r":
-                    threshold_high += 10
-                    if threshold_high > 255:
-                        threshold_high = 255
+                    if (threshold_high + 10) < 256:
+                        threshold_high += 10
                     print "threshold_high set to %i" % threshold_high
                 elif key_press is "f":
-                    threshold_high -= 10
-                    if threshold_high < 0:
-                        threshold_high = 0
+                    if (threshold_high -10) >= 0:
+                        threshold_high -= 10
                     print "threshold_high set to %i" % threshold_high
                 elif key_press is "s":
-                    if (camera.shutter_speed - 10000) > shutter_min:
+                    if (camera.shutter_speed - 10000) >= shutter_min:
                         camera.shutter_speed -= 10000
                     print "Shutter speed set to: %s" % camera.shutter_speed
                 elif key_press is "w":
-                    if (camera.shutter_speed + 10000) < shutter_max:
+                    if (camera.shutter_speed + 10000) <= shutter_max:
                         camera.shutter_speed += 10000
                     print "Shutter speed set to: %s" % camera.shutter_speed
                 # Check for SHIFT+P and if found, set working image to pure black again
@@ -207,7 +225,7 @@ with picamera.PiCamera() as camera:
     camera.iso = 100
     camera.start_preview()
     # Wait for automatic gain control to settle
-    time.sleep(3)
+    time.sleep( int(20/video_framerate) )
     # Now fix the values
     camera.shutter_speed = camera.exposure_speed
     brightness = camera.brightness
@@ -224,15 +242,16 @@ with picamera.PiCamera() as camera:
 
     # Set up mask image
     drawOvermask()
+    
     # Now loop, within context of this camera object so we don't have to re-initialise
     
     # MAIN LOOP START
-    with picamera.PiCameraCircularIO(camera, seconds=1) as stream:
+    with picamera.PiCameraCircularIO(camera, seconds=buffer_length) as stream:
         # Pre-populare the camera buffer. Need a short buffer so it's always overflowing
         # (with a deep buffer we'll see the same first frame each time)
         # (although we've a suspicion this isn't behaving as we think)
         camera.start_recording(stream, format='rgb')
-        camera.wait_recording(1)
+        camera.wait_recording(prerecord_seconds)
         try:
             time_begin = time.time()
             while True:
@@ -294,13 +313,8 @@ with picamera.PiCamera() as camera:
                 composite.paste(frame_new, (0,0), mask)
                 
                 # Apply overlay mask
-                
-                #~ overmask_invert = ImageOps.invert(overmask)
                 composite.paste(overmask, (0,0), ImageOps.invert(overmask))
                 
-                #~ composite.putalpha(overmask)
-                #~ composite.paste(overmask, (0,0), PIL.ImageOps.invert(overmask)) 
-
                 # ***** DISPLAY NEW FRAME *****    
                 # Prepare the PyGame surface
                 # Need to convert PIL image to string representation, then string to PyGame image. Ugh.
@@ -323,15 +337,14 @@ with picamera.PiCamera() as camera:
                 screen.blit(pygame_surface, (0,0))
                 pygame.display.flip()
                 
-                frame_count += 1
                 time_taken = time.time() - time_start
                 time_since_begin = time.time() - time_begin
                 print "Frame %d in %.3f secs, at %.2f fps: shutter: %d, low: %d high: %d" % (frame_count, time_taken, (frame_count/time_since_begin), camera.shutter_speed, threshold_low, threshold_high)
                 
+                frame_count += 1
+                
                 if (frame_count % framedump_interval == 0):
-                    framedump_name = "frame-" + str(frame_count) + ".jpeg"
-                    composite.save(framedump_name)
-                    print "Frame saved as %s" % framedump_name
+                    framedump()
                 
                 # and around we go again.
 
