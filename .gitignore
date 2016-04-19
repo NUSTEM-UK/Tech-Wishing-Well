@@ -1,4 +1,4 @@
 #files to ignore
 real_config.py
 timer.pyc
-
+.AppleDouble/
