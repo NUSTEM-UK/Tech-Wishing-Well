@@ -64,10 +64,12 @@ class Ui_MainWindow(object):
         
         self.groupBox = QtGui.QGroupBox(self.centralwidget)
         self.groupBox.setObjectName(_fromUtf8("colourgroup"))
+        self.groupBox.setFlat(True)
         self.left_grid_layout.addWidget(self.groupBox, 7, 2, 1, 1)
         
         self.groupBox2 = QtGui.QGroupBox(self.centralwidget)
         self.groupBox2.setObjectName(_fromUtf8("directiongroup"))
+        self.groupBox2.setFlat(True)
         self.left_grid_layout.addWidget(self.groupBox2, 8, 0, 1, 1)
         
         # PyQT4 code for the Skutter Checkboxes
@@ -170,6 +172,7 @@ class Ui_MainWindow(object):
         self.tran_fade = QtGui.QRadioButton(self.gridLayoutWidget)
         self.tran_fade.setObjectName(_fromUtf8("tran_fade"))
         self.vertical_layout_wheel.addWidget(self.tran_fade)
+        self.trans_wheel.setChecked(True)
         #self.left_grid_layout.addLayout(self.vertical_layout_wheel, 7, 2, 1, 1)
         
         
@@ -182,6 +185,8 @@ class Ui_MainWindow(object):
         self.anticlockwise = QtGui.QRadioButton(self.gridLayoutWidget)
         self.anticlockwise.setObjectName(_fromUtf8("anticlockwise"))
         self.vertical_layout_direction.addWidget(self.anticlockwise)
+        self.clockwise.setChecked(True)
+
         
         self.skutter_control_label = QtGui.QLabel(self.gridLayoutWidget)
         font = QtGui.QFont()
@@ -269,10 +274,10 @@ class Ui_MainWindow(object):
         self.skut_update.clicked.connect(self.skutter_update)
                         
         # hue slider
-        self.hue_slider.sliderReleased.connect(self.HSVtoHEXupload) 
+        self.hue_slider.sliderMoved.connect(self.HSVtoHEXupload) 
         
         # brightness slider
-        self.bright_slider.sliderReleased.connect(self.HSVtoHEXupload) 
+        self.bright_slider.sliderMoved.connect(self.HSVtoHEXupload) 
                
     def skut_toggler(self):
         self.skut1.setChecked(True)
