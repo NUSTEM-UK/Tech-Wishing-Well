@@ -316,27 +316,14 @@ with picamera.PiCamera() as camera:
                 composite.paste(overmask, (0,0), ImageOps.invert(overmask))
                 
                 # ***** DISPLAY NEW FRAME *****    
-                # Prepare the PyGame surface
-                # Need to convert PIL image to string representation, then string to PyGame image. Ugh.
-                # Mode switching doesn't work for now, but the stub is here.
-                if output_mode is 1:
-                    # Default mode: display composite
-                    # pygame.surfarray.blit_array(pygame_surface, composite)
-                    raw_str = composite.tostring("raw", 'RGBA')
-                    pygame_surface = pygame.image.fromstring(raw_str, size, 'RGBA')
-                elif output_mode is 2:
-                    # Display mask only. Doesn't work.
-                    raw_str = mask.tostring("raw", 'L')
-                    pygame.surface = pygame.image.fromstring(raw_str, size, 'P')
-                elif output_mode is 3:
-                    # Display raw image (no composite). Doesn't work.
-                    raw_str = frame.tostring("raw", 'RGBA')
-                    pygame.surface = pygame.image.fromstring(raw_str, size, 'RGBA')
+                raw_str = composite.tostring("raw", 'RGBA')
+                pygame_surface = pygame.image.fromstring(raw_str, size, 'RGBA')
                 
                 # Finally, update the window
                 screen.blit(pygame_surface, (0,0))
                 pygame.display.flip()
                 
+                # ***** OUTPUT FRAME STATS AND INFO *****
                 time_taken = time.time() - time_start
                 time_since_begin = time.time() - time_begin
                 print "Frame %d in %.3f secs, at %.2f fps: shutter: %d, low: %d high: %d" % (frame_count, time_taken, (frame_count/time_since_begin), camera.shutter_speed, threshold_low, threshold_high)
@@ -346,7 +333,7 @@ with picamera.PiCamera() as camera:
                 if (frame_count % framedump_interval == 0):
                     framedump()
                 
-                # and around we go again.
+                # ***** /LOOP *****
 
         finally:
             camera.stop_recording()
