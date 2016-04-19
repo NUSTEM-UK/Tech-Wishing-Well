@@ -10,7 +10,7 @@ import io, time, sys
 import pygame
 import picamera
 import picamera.array
-from PIL import Image, ImageStat
+from PIL import Image, ImageStat, ImageOps, ImageDraw
 import numpy as np
 
 # Set working frame size (multiples of 32h, 16v -- or padded to these)
@@ -55,6 +55,27 @@ composite = composite.convert('RGBA')
 raw_str = composite.tostring("raw", 'RGBA')
 pygame_surface = pygame.image.fromstring(raw_str, size, 'RGBA')
 
+# Set up overlay mask image
+# Oversize so it anti-aliases on scaledown
+overmask_size = (width * 3, height *3)
+overmask_centre = [ overmask_size[0] / 2 , overmask_size[1] / 2 ]
+overmask_radius = overmask_size[0] /2 
+
+def drawOvermask():
+    global overmask
+    global overmask_size
+    global overmask_radius
+    global overmask_centre
+    overmask = Image.new('L', overmask_size, 0)
+    draw = ImageDraw.Draw(overmask)
+    draw.ellipse (  (
+        (overmask_centre[0] - overmask_radius),
+        (overmask_centre[1] - overmask_radius),
+        (overmask_centre[0] + overmask_radius),
+        (overmask_centre[1] + overmask_radius) ), fill = 255)
+    overmask = overmask.resize(size, Image.ANTIALIAS)
+
+
 def get_brightness(image):
     """Return overall brightness value for image"""
     stat = ImageStat.Stat(image)
@@ -66,6 +87,9 @@ def handlePygameEvents():
     global output_mode
     global composite
     global frame_count
+    global overmask_size
+    global overmask_centre
+    global overmask_radius
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
         elif event.type is pygame.KEYDOWN:
@@ -106,6 +130,28 @@ def handlePygameEvents():
                 output_mode += 1
                 if output_mode > 3:
                     output_mode = 1
+            elif key_press is "i":
+                if ( overmask_centre[1] - 10 ) > 0:
+                    overmask_centre[1] -= 10
+                    drawOvermask()
+            elif key_press is "k":
+                if ( overmask_centre[1] + 10 ) < overmask_size[1]:
+                    overmask_centre[1] += 10
+                    drawOvermask()
+            elif key_press is "j":
+                if ( overmask_centre[0] - 10 ) > 0:
+                    overmask_centre[0] -= 10
+                    drawOvermask()
+            elif key_press is "l":
+                if ( overmask_centre[0] + 10 ) < overmask_size[0]:
+                    overmask_centre[0] += 10
+                    drawOvermask()
+            elif key_press is "y":
+                overmask_radius += 10
+                drawOvermask()
+            elif key_press is "h":
+                overmask_radius -= 10
+                drawOvermask()
             elif key_press is "o":
                 framedump_name = "frame-" + str(frame_count) + ".jpeg"
                 composite.save(framedump_name)
@@ -176,6 +222,8 @@ with picamera.PiCamera() as camera:
     print "White Balance (red, blue): %s" % (white_balance,) # comma is weird tuple munging thing
     print "Camera Brightness: %s" % brightness
 
+    # Set up mask image
+    drawOvermask()
     # Now loop, within context of this camera object so we don't have to re-initialise
     
     # MAIN LOOP START
@@ -244,6 +292,14 @@ with picamera.PiCamera() as camera:
                 # Combine captured frame with rolling composite, via computed mask
                 # TODO: Check this is really doing what we think it is
                 composite.paste(frame_new, (0,0), mask)
+                
+                # Apply overlay mask
+                
+                #~ overmask_invert = ImageOps.invert(overmask)
+                composite.paste(overmask, (0,0), ImageOps.invert(overmask))
+                
+                #~ composite.putalpha(overmask)
+                #~ composite.paste(overmask, (0,0), PIL.ImageOps.invert(overmask)) 
 
                 # ***** DISPLAY NEW FRAME *****    
                 # Prepare the PyGame surface

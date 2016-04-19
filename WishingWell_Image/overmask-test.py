@@ -11,7 +11,8 @@ im.putalpha(overmask)
 im.save('output5.png')
 
 composite_background = Image.new('RGBA', (1920, 1080), (0, 0, 0, 255))
-centre = ((composite_background.size[0] / 2) - (im.size[0] / 2), (composite_background.size[1] / 2) - (im.size[1] / 2))
+centre = ((composite_background.size[0] / 2) - (im.size[0] / 2),
+ (composite_background.size[1] / 2) - (im.size[1] / 2))
 print centre
 composite_background.paste(im, centre, im)
 composite_background.save('output6.png')
