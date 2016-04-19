@@ -13,7 +13,7 @@
 ##############################################################################
 
 from PyQt4 import QtCore, QtGui
-import paho.mqtt.client as mqtt
+#import paho.mqtt.client as mqtt
 
 # these modules allow us to convert a HSV colour value to a HEX code (via RGB)
 import matplotlib.colors as colors
@@ -61,6 +61,56 @@ class Ui_MainWindow(object):
         self.left_grid_layout = QtGui.QGridLayout(self.gridLayoutWidget)
         self.left_grid_layout.setMargin(0)
         self.left_grid_layout.setObjectName(_fromUtf8("left_grid_layout"))
+        
+        self.groupBox = QtGui.QGroupBox(self.centralwidget)
+        self.groupBox.setObjectName(_fromUtf8("colourgroup"))
+        self.left_grid_layout.addWidget(self.groupBox, 7, 2, 1, 1)
+        
+        self.groupBox2 = QtGui.QGroupBox(self.centralwidget)
+        self.groupBox2.setObjectName(_fromUtf8("directiongroup"))
+        self.left_grid_layout.addWidget(self.groupBox2, 8, 0, 1, 1)
+        
+        # PyQT4 code for the Skutter Checkboxes
+        # Step 1 - define the QCheckbox as part of the self.gridLayoutWidget
+        # Step 2 - name the QCheckbox
+        # Step 3 - place the checkbox in the correct row and column in the left_grid_layout
+        self.skut1 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut1.setObjectName(_fromUtf8("skut1"))
+        self.left_grid_layout.addWidget(self.skut1, 1, 0, 1, 1)
+        
+        self.skut2 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut2.setObjectName(_fromUtf8("skut2"))
+        self.left_grid_layout.addWidget(self.skut2, 1, 1, 1, 1)
+        
+        self.skut3 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut3.setObjectName(_fromUtf8("skut3"))
+        self.left_grid_layout.addWidget(self.skut3, 1, 2, 1, 1)
+        
+        self.skut4 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut4.setObjectName(_fromUtf8("skut4"))
+        self.left_grid_layout.addWidget(self.skut4, 2, 0, 1, 1)
+        
+        self.skut5 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut5.setObjectName(_fromUtf8("skut5"))
+        self.left_grid_layout.addWidget(self.skut5, 2, 1, 1, 1)
+        
+        self.skut6 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut6.setObjectName(_fromUtf8("skut6"))
+        self.left_grid_layout.addWidget(self.skut6, 2, 2, 1, 1)
+        
+        self.skut7 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut7.setObjectName(_fromUtf8("skut7"))
+        self.left_grid_layout.addWidget(self.skut7, 3, 0, 1, 1)
+        
+        self.skut8 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut8.setObjectName(_fromUtf8("skut8"))
+        self.left_grid_layout.addWidget(self.skut8, 3, 1, 1, 1)
+        
+        self.skut9 = QtGui.QCheckBox(self.gridLayoutWidget)
+        self.skut9.setObjectName(_fromUtf8("skut9"))
+        self.left_grid_layout.addWidget(self.skut9, 3, 2, 1, 1)
+        
+        
 
         self.servo_control_label = QtGui.QLabel(self.gridLayoutWidget)
         font = QtGui.QFont()
@@ -80,10 +130,6 @@ class Ui_MainWindow(object):
         
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.left_grid_layout.addItem(spacerItem, 5, 1, 1, 1)
-        
-        self.skut3 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.skut3.setObjectName(_fromUtf8("skut3"))
-        self.left_grid_layout.addWidget(self.skut3, 1, 2, 1, 1)
         
         self.vertical_layout_colour = QtGui.QVBoxLayout()
         self.vertical_layout_colour.setObjectName(_fromUtf8("vertical_layout_colour"))
@@ -113,18 +159,10 @@ class Ui_MainWindow(object):
         self.vertical_layout_colour.addWidget(self.colour_display)
         self.left_grid_layout.addLayout(self.vertical_layout_colour, 7, 1, 1, 1)
         
-        self.skut4 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.skut4.setObjectName(_fromUtf8("skut4"))
-        self.left_grid_layout.addWidget(self.skut4, 2, 0, 1, 1)
         
-        self.skut9 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.skut9.setObjectName(_fromUtf8("skut9"))
-        self.left_grid_layout.addWidget(self.skut9, 3, 2, 1, 1)
         
-        self.skut1 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.skut1.setObjectName(_fromUtf8("skut1"))
-        self.left_grid_layout.addWidget(self.skut1, 1, 0, 1, 1)
-        self.vertical_layout_wheel = QtGui.QVBoxLayout()
+        
+        self.vertical_layout_wheel = QtGui.QVBoxLayout(self.groupBox)
         self.vertical_layout_wheel.setObjectName(_fromUtf8("vertical_layout_wheel"))
         self.trans_wheel = QtGui.QRadioButton(self.gridLayoutWidget)
         self.trans_wheel.setObjectName(_fromUtf8("trans_wheel"))
@@ -132,22 +170,19 @@ class Ui_MainWindow(object):
         self.tran_fade = QtGui.QRadioButton(self.gridLayoutWidget)
         self.tran_fade.setObjectName(_fromUtf8("tran_fade"))
         self.vertical_layout_wheel.addWidget(self.tran_fade)
-        self.left_grid_layout.addLayout(self.vertical_layout_wheel, 7, 2, 1, 1)
-        self.skut6 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.skut6.setObjectName(_fromUtf8("skut6"))
-        self.left_grid_layout.addWidget(self.skut6, 2, 2, 1, 1)
-        self.skut2 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.skut2.setObjectName(_fromUtf8("skut2"))
-        self.left_grid_layout.addWidget(self.skut2, 1, 1, 1, 1)
-        self.skut5 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.skut5.setObjectName(_fromUtf8("skut5"))
-        self.left_grid_layout.addWidget(self.skut5, 2, 1, 1, 1)
-        self.skut7 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.skut7.setObjectName(_fromUtf8("skut7"))
-        self.left_grid_layout.addWidget(self.skut7, 3, 0, 1, 1)
-        self.skut8 = QtGui.QCheckBox(self.gridLayoutWidget)
-        self.skut8.setObjectName(_fromUtf8("skut8"))
-        self.left_grid_layout.addWidget(self.skut8, 3, 1, 1, 1)
+        #self.left_grid_layout.addLayout(self.vertical_layout_wheel, 7, 2, 1, 1)
+        
+        
+        self.vertical_layout_direction = QtGui.QVBoxLayout(self.groupBox2)
+        self.vertical_layout_direction.setObjectName(_fromUtf8("vertical_layout_direction"))
+		
+	self.clockwise = QtGui.QRadioButton(self.gridLayoutWidget)
+        self.clockwise.setObjectName(_fromUtf8("clockwise"))
+        self.vertical_layout_direction.addWidget(self.clockwise)
+        self.anticlockwise = QtGui.QRadioButton(self.gridLayoutWidget)
+        self.anticlockwise.setObjectName(_fromUtf8("anticlockwise"))
+        self.vertical_layout_direction.addWidget(self.anticlockwise)
+        
         self.skutter_control_label = QtGui.QLabel(self.gridLayoutWidget)
         font = QtGui.QFont()
         font.setBold(True)
@@ -183,8 +218,10 @@ class Ui_MainWindow(object):
         self.trans_time = QtGui.QSpinBox(self.gridLayoutWidget)
         self.trans_time.setObjectName(_fromUtf8("trans_time"))
         self.vertical_layout_time.addWidget(self.trans_time)
+        
         spacerItem1 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.vertical_layout_time.addItem(spacerItem1)
+        
         self.left_grid_layout.addLayout(self.vertical_layout_time, 7, 3, 1, 1)
         self.skut_update = QtGui.QPushButton(self.gridLayoutWidget)
         self.skut_update.setObjectName(_fromUtf8("skut_update"))
@@ -217,12 +254,8 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
         MainWindow.setStatusBar(self.statusbar)
 
-        self.clockwise = QtGui.QRadioButton(self.gridLayoutWidget)
-        self.clockwise.setObjectName(_fromUtf8("clockwise"))
-        self.left_grid_layout.addWidget(self.clockwise, 8, 0, 1, 1)
-        self.anticlockwise = QtGui.QRadioButton(self.gridLayoutWidget)
-        self.anticlockwise.setObjectName(_fromUtf8("anticlockwise"))
-        self.left_grid_layout.addWidget(self.anticlockwise, 9, 0, 1, 1)
+        
+        
         self.retranslateUi(MainWindow)
         
         QtCore.QObject.connect(self.servo_dial, QtCore.SIGNAL(_fromUtf8("valueChanged(int)")), self.servo_display.display)
@@ -371,7 +404,7 @@ class Ui_MainWindow(object):
         self.skut_update.setText(_translate("MainWindow", "Send Update", None))
         self.skut_toggle.setText(_translate("MainWindow", "All/None", None))
         self.clockwise.setText(_translate("MainWindow", "Clockwise", None))
-        self.anticlockwise.setText(_translate("MainWindow", "Anticlockwise", None))
+        self.anticlockwise.setText(_translate("MainWindow", "Anticlock", None))
 
 if __name__ == "__main__":
     import sys
