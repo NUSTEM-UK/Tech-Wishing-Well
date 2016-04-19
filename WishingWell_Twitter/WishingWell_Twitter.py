@@ -35,10 +35,11 @@ newest_file = ""
 
 for name in files:
     st = os.stat(name)
-    if st[ST_MTIME] > newest_value:
-            newest_value = st[ST_MTIME]
+    if st[ST_MTIME] > newfile_timestamp:
+            newfile_timestamp = st[ST_MTIME]
             #newest_file = name
             
+print newfile_timestamp           
 
 
 # this is the button debounce function
@@ -63,7 +64,7 @@ tweet2 = "This is the third Tweet"
 # write any twitter handles we want to include here
 twit_message = tweet0
 
-# create and rotate the PiCamera
+#create and rotate the PiCamera
 camera = picamera.PiCamera()
 camera.rotation = 270
 camera.start_preview()
@@ -71,51 +72,59 @@ camera.start_preview()
 
 try:
     while True:
+        
         try:
+            # get all the files in the Output folder
             files = glob.glob('/home/pi/Maker_Faire_2016/Outputs/*.jpeg')
             for name in files:
+                # for each file get the stats
                 st = os.stat(name)
-                if st[ST_MTIME] > newest_value:
-                    newest_value = st[ST_MTIME]
+                # if there is a file with a newer timestamp than last file then upload it to twitter
+                if st[ST_MTIME] > newfile_timestamp:
+                    newfile_timestamp = st[ST_MTIME]
                     newest_file = name
+                    print newfile_timestamp
+                    print newest_file
                     photo = open(newest_file, 'rb')
                     response = twitter.upload_media(media = photo)
                     twitter.update_status(status = "This bit of the code works!", media_ids=[response['media_id']])
                     photo.close()
+        
+        finally:
             
-        if GPIO.input(select_btn) == False:
-            if tweet_choice == 0:
-                tweet_choice = 1
-                twit_message = tweet1
-                light_switch(False, True, False)
-            elif tweet_choice == 1:
-                tweet_choice = 2
-                light_switch(False, False, True)
-                twit_message = tweet2
-            else:
-                tweet_choice = 0
-                light_switch(True, False, False)
-                twit_message = tweet0
-            debounce()
-            
-        # this is the if statement that takes the image to upload to twitter
-        elif GPIO.input(tweet_btn) == False:
-            time.sleep(1)
-            camera.annotate_text = '3'
-            time.sleep(1)
-            camera.annotate_text = '2'
-            time.sleep(1)
-            camera.annotate_text = '1'
-            time.sleep(1)
-            camera.annotate_text = 'Smile!'
-            time.sleep(0.7)
-            camera.capture('image.jpg')
-            camera.annotate_text = ''
-            # create the tweet
-            photo = open('image.jpg', 'rb')
-            response = twitter.upload_media(media = photo)
-            twitter.update_status(status = twit_message, media_ids=[response['media_id']])
-            debounce()
+            if GPIO.input(select_btn) == False:
+                if tweet_choice == 0:
+                    tweet_choice = 1
+                    twit_message = tweet1
+                    light_switch(False, True, False)
+                elif tweet_choice == 1:
+                    tweet_choice = 2
+                    light_switch(False, False, True)
+                    twit_message = tweet2
+                else:
+                    tweet_choice = 0
+                    light_switch(True, False, False)
+                    twit_message = tweet0
+                debounce()
+                
+            # this is the if statement that takes the image to upload to twitter
+            elif GPIO.input(tweet_btn) == False:
+                time.sleep(1)
+                camera.annotate_text = '3'
+                time.sleep(1)
+                camera.annotate_text = '2'
+                time.sleep(1)
+                camera.annotate_text = '1'
+                time.sleep(1)
+                camera.annotate_text = 'Smile!'
+                time.sleep(0.7)
+                camera.capture('image.jpg')
+                camera.annotate_text = ''
+                # create the tweet
+                photo = open('image.jpg', 'rb')
+                response = twitter.upload_media(media = photo)
+                twitter.update_status(status = twit_message, media_ids=[response['media_id']])
+                debounce()
             
 finally:
     # cleanup the GPIO pins on keyboard interupt
