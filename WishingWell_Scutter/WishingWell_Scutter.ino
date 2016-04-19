@@ -3,9 +3,9 @@
 #include <Servo.h>
 #include <Adafruit_NeoPixel.h>
 
-const char* ssid = "WishingWell";
+const char* ssid = "wishingwell";
 const char* password = "thinkphysics1";
-const char* mqtt_server = "192.168.1.101";
+const char* mqtt_server = "10.0.1.4";
 
 String huzzahMACAddress;
 String scutterNameString;
@@ -109,6 +109,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print(topicString);
     Serial.print(F("] "));
     Serial.println(payloadString);
+    active = true;
 
     // Now handle the possible messages, matching on topic
     
