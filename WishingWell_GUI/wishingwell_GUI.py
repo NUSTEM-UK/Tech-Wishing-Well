@@ -275,9 +275,10 @@ class Ui_MainWindow(object):
                         
         # hue slider
         self.hue_slider.sliderMoved.connect(self.HSVtoHEXupload) 
-        
+        self.hue_slider.valueChanged.connect(self.HSVtoHEXupload) 
         # brightness slider
         self.bright_slider.sliderMoved.connect(self.HSVtoHEXupload) 
+        self.bright_slider.valueChanged.connect(self.HSVtoHEXupload)
                
     def skut_toggler(self):
         self.skut1.setChecked(True)
