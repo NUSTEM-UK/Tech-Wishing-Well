@@ -5,7 +5,8 @@
 
 const char* ssid = "wishingwell";
 const char* password = "thinkphysics1";
-const char* mqtt_server = "10.0.1.4";
+const char* mqtt_server = "gooeypi.local";
+//const char* mqtt_server = "10.0.1.4";
 
 String huzzahMACAddress;
 String scutterNameString;
