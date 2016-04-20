@@ -252,7 +252,7 @@ class Ui_MainWindow(object):
         self.skut_toggle.setObjectName(_fromUtf8("skut_toggle"))
         self.skut_toggle.setFixedSize(80, 30)
         self.left_grid_layout.addWidget(self.skut_toggle, 4, 3, 1, 1)
-        """
+        
         self.gridLayoutWidget_2 = QtGui.QWidget(self.centralwidget)
         self.gridLayoutWidget_2.setGeometry(QtCore.QRect(740, 100, 191, 401))
         self.gridLayoutWidget_2.setObjectName(_fromUtf8("gridLayoutWidget_2"))
@@ -261,14 +261,14 @@ class Ui_MainWindow(object):
         self.right_grid_layout.setMargin(0)
         self.right_grid_layout.setObjectName(_fromUtf8("right_grid_layout"))
         
-       """
+       
         font = QtGui.QFont()
         font.setBold(True)
         font.setUnderline(False)
         font.setWeight(75)
        
         MainWindow.setCentralWidget(self.centralwidget)
-        """
+        
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1080, 27))
         self.menubar.setObjectName(_fromUtf8("menubar"))
@@ -276,7 +276,7 @@ class Ui_MainWindow(object):
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName(_fromUtf8("statusbar"))
         MainWindow.setStatusBar(self.statusbar)
-        """
+        
 
         # add all the correct labels
         self.retranslateUi(MainWindow)

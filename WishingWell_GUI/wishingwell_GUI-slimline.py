@@ -126,7 +126,17 @@ class Ui_MainWindow(object):
         # create a frame which will display the current colour choice
         self.colour_display = QtGui.QFrame(self.gridLayoutWidget)
         self.vertical_layout_colour.addWidget(self.colour_display)
+        self.colour_display.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.colour_display.setFrameShadow(QtGui.QFrame.Raised)
         self.left_grid_layout.addLayout(self.vertical_layout_colour, 7, 1, 1, 1)
+        
+        #~ self.colour_display = QtGui.QFrame(self.gridLayoutWidget)
+        #~ self.colour_display.setFrameShape(QtGui.QFrame.StyledPanel)
+        #~ self.colour_display.setFrameShadow(QtGui.QFrame.Raised)
+        #~ self.colour_display.setObjectName(_fromUtf8("colour_display"))
+        
+        #~ self.vertical_layout_colour.addWidget(self.colour_display)
+        #~ self.left_grid_layout.addLayout(self.vertical_layout_colour, 7, 1, 1, 1)
         
         # create a vertical layout box to house the trans and fade radio buttons
         # add this to the group1 box to ensure toggle-ability
