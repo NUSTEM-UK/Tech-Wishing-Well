@@ -65,6 +65,7 @@ light_switch(True, False, False)
 tweet0 = "This is the first Tweet"
 tweet1 = "This is the second Tweet"
 tweet2 = "This is the third Tweet"
+wishing_well_tweet = ""
 
 # write any twitter handles we want to include here
 twit_message = tweet0
@@ -84,13 +85,9 @@ try:
             if st[ST_MTIME] > newfile_timestamp:
                 newfile_timestamp = st[ST_MTIME]
                 newest_file = name
-                #~ print "New files at timestamp:" + str(newfile_timestamp)
-                #~ print "New, new file: " + newest_file
                 photo = open(newest_file, 'rb')
                 response = twitter.upload_media(media = photo)
-                #~ print "Uploading photo"
-                twitter.update_status(status = "This bit of the code works!", media_ids=[response['media_id']])
-                #~ print "Photo uploaded successfully"
+                twitter.update_status(status = wishing_well_tweet, media_ids=[response['media_id']])
                 photo.close()
         
             
@@ -121,8 +118,8 @@ try:
             time.sleep(1)
             camera.annotate_text = 'Smile!'
             time.sleep(0.7)
-            camera.capture('image.jpg')
             camera.annotate_text = ''
+            camera.capture('image.jpg')
             photo = open('image.jpg', 'rb')
             response = twitter.upload_media(media = photo)
             twitter.update_status(status = twit_message, media_ids=[response['media_id']])
