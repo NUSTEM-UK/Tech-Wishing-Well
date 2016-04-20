@@ -168,6 +168,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
     }
     
     /* ACT ON SETTINGS *******************************************/
+    // Likely need to move this to loop(), with a check for in_transition.
+    // Otherwise, we're going to block the callback during transition execution,
+    // and not respond to additional incoming messages.
     if (active) {
       Serial.println(F("----------------------------------------")); 
       Serial.println(F("Executing commanded changes:"));   
