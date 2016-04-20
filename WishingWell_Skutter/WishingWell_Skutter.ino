@@ -88,15 +88,6 @@ void loop() {
   }
   client.loop();
 
-//  long now = millis();
-//  if (now - lastMsg > 2000) {
-//    lastMsg = now;
-//    ++value;
-//    snprintf (msg, 75, "hello world #%ld", value);
-////    Serial.print("Publish message: ");
-////    Serial.println(msg);
-//    client.publish("outTopic", msg);
-//  }
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -141,6 +132,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
       } else if ( payloadString == "0" ) {
         servoReverse = true;
       }
+      in_transition = true;
     }
 
     /* SERVO SPEED CHANGED ***************************************/
@@ -148,6 +140,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
       int speedPercent = payloadString.toInt();
       // GUI client gives percent speed, so need to map:
       selectedSpeed = map(speedPercent, 0, 100, 0, 90);
+      in_transition = true;
     }
 
     if ( (topicString == "wishing/colour") && active ) {
@@ -158,6 +151,20 @@ void callback(char* topic, byte* payload, unsigned int length) {
       r = number >> 16;
       g = number >> 8 & 0xFF;
       b = number & 0xFF;
+      in_transition = true;
+    }
+
+    if ( (topicString == "wishing/time") && active ) {
+      int transition_timeRemaining = payloadString.toInt();
+    }
+
+    if ( (topicString == "wishing/transition") && active ) {
+      // Check for "wheel", else assume "fade" - basic error checking.
+      if (payloadString == "wheel") {
+        transitionType = "wheel";
+      } else {
+        transitionType = "fade";
+      }
     }
     
     /* ACT ON SETTINGS *******************************************/
