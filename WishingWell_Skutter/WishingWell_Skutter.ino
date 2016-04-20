@@ -5,12 +5,12 @@
 
 const char* ssid = "wishingwell";
 const char* password = "thinkphysics1";
-const char* mqtt_server = "gooeypi.local";
+const char* mqtt_server = "gooeypi.local"; // Test this, see if it works. If it does
 //const char* mqtt_server = "10.0.1.4";
 
 String huzzahMACAddress;
-String scutterNameString;
-char scutterNameArray[25];
+String skutterNameString;
+char skutterNameArray[25];
 
 String subsTargetString;
 char subsTargetArray[34];
@@ -51,10 +51,10 @@ void setup() {
   setup_wifi();
 
   huzzahMACAddress = WiFi.macAddress();
-  scutterNameString = "Scutter_" + huzzahMACAddress;
-  Serial.println(scutterNameString);
-  scutterNameString.toCharArray(scutterNameArray, 25);
-  subsTargetString = "wishing/" + scutterNameString;
+  skutterNameString = "skutter_" + huzzahMACAddress;
+  Serial.println(skutterNameString);
+  skutterNameString.toCharArray(skutterNameArray, 25);
+  subsTargetString = "wishing/" + skutterNameString;
   subsTargetString.toCharArray(subsTargetArray, 34);
   for (int i = 0 ; i < 34 ; i++) {
     Serial.print(subsTargetArray[i]);
@@ -110,20 +110,19 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print(topicString);
     Serial.print(F("] "));
     Serial.println(payloadString);
-    active = true;
 
     // Now handle the possible messages, matching on topic
     
     /* TARGET CHANGED ********************************************/
     if (topicString == subsTargetString) {
-      Serial.println(F("Scutter target signal"));
-      // Check to see if this Scutter is disabled, else enable
+      Serial.println(F("Skutter target signal"));
+      // Check to see if this Skutter is disabled, else enable
       if (payloadString == "0") {
         active = false;
-        Serial.println(F("This Scutter is now inactive"));
+        Serial.println(F("This Skutter is now inactive"));
       } else {
         active = true;
-        Serial.println(F("This Scutter is now ACTIVE!"));
+        Serial.println(F("This Skutter is now ACTIVE!"));
       }
     }
 
