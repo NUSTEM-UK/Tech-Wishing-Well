@@ -25,7 +25,7 @@ script, file_prefix = argv
 # Best frame-rate compromise for a 1920x1080 display is probably 864 
 size = width, height = 864, 864
 # Should we display full screen, or windowed?
-full_screen = 0
+full_screen = 1
 
 # Video settings
 # Keep the video_framerate low to allow longer shutter speeds.
@@ -120,95 +120,100 @@ def handlePygameEvents():
     global overmask_size
     global overmask_centre
     global overmask_radius
+    global full_screen
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
         elif event.type is pygame.KEYDOWN:
-            key_press = pygame.key.name(event.key)
+            key_press = event.key
+            # key_press = pygame.key.name(event.key)
             # print key_press # For diagnostic purposes, but messes up output
-            if key_press is "s":
+            if key_press == pygame.K_s:
                 if (camera.shutter_speed - 1000) >= shutter_min:
                     camera.shutter_speed -= 1000
                 print "Shutter speed set to: %s" % camera.shutter_speed
-            elif key_press is "w":
+            elif key_press == pygame.K_w:
                 if (camera.shutter_speed + 1000) <= shutter_max:
                     camera.shutter_speed += 1000
                 print "Shutter speed set to: %s" % camera.shutter_speed
-            elif key_press is "e":
+            elif key_press == pygame.K_e:
                 if (threshold_low + 1) < 256:
                     threshold_low += 1
                 print "threshold_low set to %i" % threshold_low
-            elif key_press is "d":
+            elif key_press == pygame.K_d:
                 if (threshold_low - 1) >= 0:
                     threshold_low -= 1
                 print "threshold_low set to %i" % threshold_low
-            elif key_press is "r":
+            elif key_press == pygame.K_r:
                 if (threshold_high + 1) < 256:
                     threshold_high += 1
                 print "threshold_high set to %i" % threshold_high
-            elif key_press is "f":
+            elif key_press == pygame.K_f:
                 if (threshold_high -1) >= 0:
                     threshold_high -= 1
                 print "threshold_high set to %i" % threshold_high
-            elif key_press is "m":
-                # Toggle output mode
-                output_mode += 1
-                if output_mode > 3:
-                    output_mode = 1
-            elif key_press is "i":
+            elif key_press == pygame.K_m:
+                if full_screen:
+                    pygame.display.set_mode(size)
+                    pygame.mouse.set_visible(1)
+                else:
+                    pygame.display.set_mode(size, pygame.FULLSCREEN)
+                    pygame.mouse.set_visible(0)
+                full_screen = not full_screen
+            elif key_press == pygame.K_i:
                 if ( overmask_centre[1] - 10 ) > 0:
                     overmask_centre[1] -= 10
                     drawOvermask()
-            elif key_press is "k":
+            elif key_press == pygame.K_k:
                 if ( overmask_centre[1] + 10 ) < overmask_size[1]:
                     overmask_centre[1] += 10
                     drawOvermask()
-            elif key_press is "j":
+            elif key_press == pygame.K_j:
                 if ( overmask_centre[0] - 10 ) > 0:
                     overmask_centre[0] -= 10
                     drawOvermask()
-            elif key_press is "l":
+            elif key_press == pygame.K_l:
                 if ( overmask_centre[0] + 10 ) < overmask_size[0]:
                     overmask_centre[0] += 10
                     drawOvermask()
-            elif key_press is "y":
+            elif key_press == pygame.K_y:
                 overmask_radius += 10
                 drawOvermask()
-            elif key_press is "h":
+            elif key_press == pygame.K_h:
                 overmask_radius -= 10
                 drawOvermask()
-            elif key_press is "o":
+            elif key_press == pygame.K_o:
                 framedump()
             
             # Check for left shift and allow rapid threshold changes
             if pygame.key.get_mods() & pygame.KMOD_LSHIFT:
-                if key_press is "q":
+                if key_press == pygame.K_q:
                     sys.exit()
-                if key_press is "e":
+                if key_press == pygame.K_e:
                     if (threshold_low + 10) < 256:
                         threshold_low += 10
                     print "threshold_low set to %i" % threshold_low
-                elif key_press is "d":
+                elif key_press == pygame.K_d:
                     if (threshold_low - 10) >= 0:
                         threshold_low -= 10
                     print "threshold_low set to %i" % threshold_low
-                elif key_press is "r":
+                elif key_press == pygame.K_r:
                     if (threshold_high + 10) < 256:
                         threshold_high += 10
                     print "threshold_high set to %i" % threshold_high
-                elif key_press is "f":
+                elif key_press == pygame.K_f:
                     if (threshold_high -10) >= 0:
                         threshold_high -= 10
                     print "threshold_high set to %i" % threshold_high
-                elif key_press is "s":
+                elif key_press == pygame.K_s:
                     if (camera.shutter_speed - 10000) >= shutter_min:
                         camera.shutter_speed -= 10000
                     print "Shutter speed set to: %s" % camera.shutter_speed
-                elif key_press is "w":
+                elif key_press == pygame.K_w:
                     if (camera.shutter_speed + 10000) <= shutter_max:
                         camera.shutter_speed += 10000
                     print "Shutter speed set to: %s" % camera.shutter_speed
                 # Check for SHIFT+P and if found, set working image to pure black again
-                elif key_press is "p":
+                elif key_press == pygame.K_p:
                     print "*** STARTING OVER ***"
                     composite = Image.frombytes('RGB', size, "\x00" * width * height * 3)
                     composite = composite.convert('RGBA')
@@ -316,27 +321,14 @@ with picamera.PiCamera() as camera:
                 composite.paste(overmask, (0,0), ImageOps.invert(overmask))
                 
                 # ***** DISPLAY NEW FRAME *****    
-                # Prepare the PyGame surface
-                # Need to convert PIL image to string representation, then string to PyGame image. Ugh.
-                # Mode switching doesn't work for now, but the stub is here.
-                if output_mode is 1:
-                    # Default mode: display composite
-                    # pygame.surfarray.blit_array(pygame_surface, composite)
-                    raw_str = composite.tostring("raw", 'RGBA')
-                    pygame_surface = pygame.image.fromstring(raw_str, size, 'RGBA')
-                elif output_mode is 2:
-                    # Display mask only. Doesn't work.
-                    raw_str = mask.tostring("raw", 'L')
-                    pygame.surface = pygame.image.fromstring(raw_str, size, 'P')
-                elif output_mode is 3:
-                    # Display raw image (no composite). Doesn't work.
-                    raw_str = frame.tostring("raw", 'RGBA')
-                    pygame.surface = pygame.image.fromstring(raw_str, size, 'RGBA')
+                raw_str = composite.tostring("raw", 'RGBA')
+                pygame_surface = pygame.image.fromstring(raw_str, size, 'RGBA')
                 
                 # Finally, update the window
                 screen.blit(pygame_surface, (0,0))
                 pygame.display.flip()
                 
+                # ***** OUTPUT FRAME STATS AND INFO *****
                 time_taken = time.time() - time_start
                 time_since_begin = time.time() - time_begin
                 print "Frame %d in %.3f secs, at %.2f fps: shutter: %d, low: %d high: %d" % (frame_count, time_taken, (frame_count/time_since_begin), camera.shutter_speed, threshold_low, threshold_high)
@@ -346,7 +338,7 @@ with picamera.PiCamera() as camera:
                 if (frame_count % framedump_interval == 0):
                     framedump()
                 
-                # and around we go again.
+                # ***** /LOOP *****
 
         finally:
             camera.stop_recording()
