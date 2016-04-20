@@ -1,8 +1,9 @@
 # Import the necessary module: GPIO, Twython, Tim and PiCamera
 import RPi.GPIO as GPIO
-import os, time
+import os, time, sys
 from twython import Twython
 import picamera
+from datetime import datetime
 
 # these modules allow us to import data on the image files to be tweeted on the hour
 from stat import *
@@ -34,8 +35,9 @@ newfile_timestamp = 0
 newest_file = ""
 #print files
 
-print ""
-print ""
+# datetime setup to add string to an image file
+FORMAT = '%Y%m%d%H%M%S'
+
 
 for name in files:
     st = os.stat(name)
@@ -107,7 +109,7 @@ try:
             debounce()
             
         # this is the if statement that takes the image to upload to twitter
-        elif GPIO.input(tweet_btn) == False:
+        if GPIO.input(tweet_btn) == False:
             camera.start_preview()
             time.sleep(1)
             camera.annotate_text = '3'
@@ -118,14 +120,18 @@ try:
             time.sleep(1)
             camera.annotate_text = 'Smile!'
             time.sleep(0.7)
+            image_path = "/home/pi/Maker_Faire_2016/TwitterImages/%s-image.jpg" % datetime.now().strftime(FORMAT)
+            camera.capture(image_path)
             camera.annotate_text = ''
-            camera.capture('image.jpg')
-            photo = open('image.jpg', 'rb')
+            photo = open(image_path, 'rb')
             response = twitter.upload_media(media = photo)
             twitter.update_status(status = twit_message, media_ids=[response['media_id']])
             
             debounce()
-            
+        elif GPIO.input(tweet_btn) == False and GPIO.input(select_btn) == False:
+            GPIO.cleanup()
+            camera.stop_preview()
+            sys.exit()
 finally:
     # cleanup the GPIO pins on keyboard interupt
     GPIO.cleanup()
