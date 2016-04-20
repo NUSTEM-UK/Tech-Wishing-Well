@@ -26,7 +26,7 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect(scutterNameArray)) {
+    if (client.connect(skutterNameArray)) {
       Serial.println("connected");
       // Once connected, publish an announcement...
 //      client.publish("outTopic", "hello world");

@@ -44,6 +44,14 @@ uint8_t r = 255;
 uint8_t g = 255;
 uint8_t b = 255;
 
+uint8_t target_r = 255;
+uint8_t target_g = 255;
+uint8_t target_b = 255;
+
+bool in_transition = false;
+uint32_t transition_timeRemaining = 0;
+String transitionType = "";
+
 
 void setup() {
   pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
@@ -155,22 +163,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
     /* ACT ON SETTINGS *******************************************/
     if (active) {
       Serial.println(F("----------------------------------------")); 
-    Serial.println(F("Executing commanded changes:"));   
-    setServoSpeed(servoReverse, selectedSpeed);
-    // Assume a strip of NeoPixels, even though we're likely working with just one
-    for (int i = 0; i < PIXEL_COUNT ; i++) {
-      strip.setPixelColor(i, r, g, b);
-      Serial.print("Pixel ");
-      Serial.print(i);
-      Serial.print(" set to ");
-      Serial.print(r);
-      Serial.print(" ");
-      Serial.print(g);
-      Serial.print(" ");
-      Serial.println(b);
-    }
-    strip.show();
-    Serial.println(F("========================================"));
+      Serial.println(F("Executing commanded changes:"));   
+      setServoSpeed(servoReverse, selectedSpeed);
+      setNeoPixelColour(r, g, b);
+      Serial.println(F("========================================"));
     }
 
 //   Switch on the LED if a 1 was received as first character
@@ -197,3 +193,21 @@ void setServoSpeed(bool servoReverse, int selectedSpeed){
   }
   myservo.write(servoPos);
 }
+
+void setNeoPixelColour(uint8_t r, uint8_t g, uint8_t b) {
+  // Assume a strip of NeoPixels, even though we're likely working with just one
+  for (int i = 0; i < PIXEL_COUNT; ++i) {
+    strip.setPixelColor(i, r, g, b);
+    strip.setPixelColor(i, r, g, b);
+      Serial.print("Pixel ");
+      Serial.print(i);
+      Serial.print(" set to ");
+      Serial.print(r);
+      Serial.print(" ");
+      Serial.print(g);
+      Serial.print(" ");
+      Serial.println(b);
+  }
+  strip.show();
+}
+
