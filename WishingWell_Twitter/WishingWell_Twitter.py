@@ -32,14 +32,19 @@ twitter = Twython(config["app_key"],config["app_secret"],config["oauth_token"],c
 files = glob.glob('/home/pi/Maker_Faire_2016/Outputs/*.jpeg')
 newfile_timestamp = 0
 newest_file = ""
+#print files
+
+print ""
+print ""
 
 for name in files:
     st = os.stat(name)
     if st[ST_MTIME] > newfile_timestamp:
             newfile_timestamp = st[ST_MTIME]
-            #newest_file = name
+            newest_file = name
             
-print newfile_timestamp           
+print "The most recent file is:" + newest_file    
+print "Created at timestamp:" + str(newfile_timestamp)       
 
 
 # this is the button debounce function
@@ -79,11 +84,13 @@ try:
             if st[ST_MTIME] > newfile_timestamp:
                 newfile_timestamp = st[ST_MTIME]
                 newest_file = name
-                print newfile_timestamp
-                print newest_file
+                #~ print "New files at timestamp:" + str(newfile_timestamp)
+                #~ print "New, new file: " + newest_file
                 photo = open(newest_file, 'rb')
                 response = twitter.upload_media(media = photo)
+                #~ print "Uploading photo"
                 twitter.update_status(status = "This bit of the code works!", media_ids=[response['media_id']])
+                #~ print "Photo uploaded successfully"
                 photo.close()
         
             
@@ -104,6 +111,7 @@ try:
             
         # this is the if statement that takes the image to upload to twitter
         elif GPIO.input(tweet_btn) == False:
+            camera.start_preview()
             time.sleep(1)
             camera.annotate_text = '3'
             time.sleep(1)
@@ -115,10 +123,10 @@ try:
             time.sleep(0.7)
             camera.capture('image.jpg')
             camera.annotate_text = ''
-            # create the tweet
             photo = open('image.jpg', 'rb')
             response = twitter.upload_media(media = photo)
             twitter.update_status(status = twit_message, media_ids=[response['media_id']])
+            
             debounce()
             
 finally:
