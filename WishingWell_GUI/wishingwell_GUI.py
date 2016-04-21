@@ -175,7 +175,7 @@ class Ui_MainWindow(object):
         self.trans_time = QtGui.QSpinBox(self.gridLayoutWidget)
         self.vertical_layout_time.addWidget(self.trans_time)
         self.left_grid_layout.addLayout(self.vertical_layout_time, 7, 3, 1, 1)
-        
+        self.trans_time.setMinimum(1)
         # add the skutter update button
         self.skut_update = QtGui.QPushButton("Send Update", self.gridLayoutWidget)
         self.left_grid_layout.addWidget(self.skut_update, 8, 3, 1, 1)
@@ -234,7 +234,7 @@ class Ui_MainWindow(object):
     def skutter_update(self):
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/skutter_18:FE:34:F4:D6:F4", self.skut1.isChecked())
+        mqttc.publish("wishing/skutter_18:FE:34:F4:D6:F4", bool(self.skut1.isChecked()))
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
         mqttc.publish("wishing/skutter_18:FE:34:F4:D4:79", self.skut2.isChecked())
@@ -296,9 +296,9 @@ class Ui_MainWindow(object):
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
         if self.clockwise.isChecked() == True:
-            mqttc.publish("wishing/direction", "True")
+            mqttc.publish("wishing/direction", 1)
         else:
-            mqttc.publish("wishing/direction", "False")
+            mqttc.publish("wishing/direction", 0)
         
     def HSVtoHEXupload(self):
         s = 1
