@@ -26,7 +26,7 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect(scutterNameArray)) {
+    if (client.connect(skutterNameArray)) {
       Serial.println("connected");
       // Once connected, publish an announcement...
 //      client.publish("outTopic", "hello world");
@@ -35,6 +35,8 @@ void reconnect() {
       client.subscribe("wishing/colour");
       client.subscribe("wishing/direction");
       client.subscribe("wishing/speed");
+      client.subscribe("wishing/transition");
+      client.subscribe("wishing/time");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());

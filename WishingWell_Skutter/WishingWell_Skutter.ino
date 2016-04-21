@@ -5,12 +5,12 @@
 
 const char* ssid = "wishingwell";
 const char* password = "thinkphysics1";
-const char* mqtt_server = "gooeypi.local";
-//const char* mqtt_server = "10.0.1.4";
+// const char* mqtt_server = "gooeypi.local"; // Test this, see if it works. If it does
+const char* mqtt_server = "10.0.1.3";
 
 String huzzahMACAddress;
-String scutterNameString;
-char scutterNameArray[25];
+String skutterNameString;
+char skutterNameArray[25];
 
 String subsTargetString;
 char subsTargetArray[34];
@@ -44,6 +44,14 @@ uint8_t r = 255;
 uint8_t g = 255;
 uint8_t b = 255;
 
+uint8_t target_r = 255;
+uint8_t target_g = 255;
+uint8_t target_b = 255;
+
+bool in_transition = false;
+uint32_t transition_timeRemaining = 0;
+String transitionType = "";
+
 
 void setup() {
   pinMode(BUILTIN_LED, OUTPUT);     // Initialize the BUILTIN_LED pin as an output
@@ -51,10 +59,10 @@ void setup() {
   setup_wifi();
 
   huzzahMACAddress = WiFi.macAddress();
-  scutterNameString = "Scutter_" + huzzahMACAddress;
-  Serial.println(scutterNameString);
-  scutterNameString.toCharArray(scutterNameArray, 25);
-  subsTargetString = "wishing/" + scutterNameString;
+  skutterNameString = "skutter_" + huzzahMACAddress;
+  Serial.println(skutterNameString);
+  skutterNameString.toCharArray(skutterNameArray, 25);
+  subsTargetString = "wishing/" + skutterNameString;
   subsTargetString.toCharArray(subsTargetArray, 34);
   for (int i = 0 ; i < 34 ; i++) {
     Serial.print(subsTargetArray[i]);
@@ -80,15 +88,6 @@ void loop() {
   }
   client.loop();
 
-//  long now = millis();
-//  if (now - lastMsg > 2000) {
-//    lastMsg = now;
-//    ++value;
-//    snprintf (msg, 75, "hello world #%ld", value);
-////    Serial.print("Publish message: ");
-////    Serial.println(msg);
-//    client.publish("outTopic", msg);
-//  }
 }
 
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -110,20 +109,19 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print(topicString);
     Serial.print(F("] "));
     Serial.println(payloadString);
-    active = true;
 
     // Now handle the possible messages, matching on topic
     
     /* TARGET CHANGED ********************************************/
     if (topicString == subsTargetString) {
-      Serial.println(F("Scutter target signal"));
-      // Check to see if this Scutter is disabled, else enable
-      if (payloadString == "0") {
+      Serial.println(F("Skutter target signal"));
+      // Check to see if this Skutter is disabled, else enable
+      if (payloadString == "False") {
         active = false;
-        Serial.println(F("This Scutter is now inactive"));
+        Serial.println(F("This Skutter is now inactive"));
       } else {
         active = true;
-        Serial.println(F("This Scutter is now ACTIVE!"));
+        Serial.println(F("This Skutter is now ACTIVE!"));
       }
     }
 
@@ -134,6 +132,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
       } else if ( payloadString == "0" ) {
         servoReverse = true;
       }
+      in_transition = true;
     }
 
     /* SERVO SPEED CHANGED ***************************************/
@@ -141,6 +140,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
       int speedPercent = payloadString.toInt();
       // GUI client gives percent speed, so need to map:
       selectedSpeed = map(speedPercent, 0, 100, 0, 90);
+      in_transition = true;
     }
 
     if ( (topicString == "wishing/colour") && active ) {
@@ -151,27 +151,32 @@ void callback(char* topic, byte* payload, unsigned int length) {
       r = number >> 16;
       g = number >> 8 & 0xFF;
       b = number & 0xFF;
+      in_transition = true;
+    }
+
+    if ( (topicString == "wishing/time") && active ) {
+      int transition_timeRemaining = payloadString.toInt();
+    }
+
+    if ( (topicString == "wishing/transition") && active ) {
+      // Check for "wheel", else assume "fade" - basic error checking.
+      if (payloadString == "wheel") {
+        transitionType = "wheel";
+      } else {
+        transitionType = "fade";
+      }
     }
     
     /* ACT ON SETTINGS *******************************************/
+    // Likely need to move this to loop(), with a check for in_transition.
+    // Otherwise, we're going to block the callback during transition execution,
+    // and not respond to additional incoming messages.
     if (active) {
       Serial.println(F("----------------------------------------")); 
-    Serial.println(F("Executing commanded changes:"));   
-    setServoSpeed(servoReverse, selectedSpeed);
-    // Assume a strip of NeoPixels, even though we're likely working with just one
-    for (int i = 0; i < PIXEL_COUNT ; i++) {
-      strip.setPixelColor(i, r, g, b);
-      Serial.print("Pixel ");
-      Serial.print(i);
-      Serial.print(" set to ");
-      Serial.print(r);
-      Serial.print(" ");
-      Serial.print(g);
-      Serial.print(" ");
-      Serial.println(b);
-    }
-    strip.show();
-    Serial.println(F("========================================"));
+      Serial.println(F("Executing commanded changes:"));   
+      setServoSpeed(servoReverse, selectedSpeed);
+      setNeoPixelColour(r, g, b);
+      Serial.println(F("========================================"));
     }
 
 //   Switch on the LED if a 1 was received as first character
@@ -198,3 +203,21 @@ void setServoSpeed(bool servoReverse, int selectedSpeed){
   }
   myservo.write(servoPos);
 }
+
+void setNeoPixelColour(uint8_t r, uint8_t g, uint8_t b) {
+  // Assume a strip of NeoPixels, even though we're likely working with just one
+  for (int i = 0; i < PIXEL_COUNT; ++i) {
+    strip.setPixelColor(i, r, g, b);
+    strip.setPixelColor(i, r, g, b);
+      Serial.print("Pixel ");
+      Serial.print(i);
+      Serial.print(" set to ");
+      Serial.print(r);
+      Serial.print(" ");
+      Serial.print(g);
+      Serial.print(" ");
+      Serial.println(b);
+  }
+  strip.show();
+}
+
