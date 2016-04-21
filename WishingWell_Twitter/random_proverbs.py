@@ -1,4 +1,4 @@
-tweetList = [
+proverbList = [
     "90% of Inspiration is Perspiration",
     "A baby is an alimentary canal with a loud voice at one end and no responsibility at the other",
     "A bad custom is like a good cake, better broken than kept",
