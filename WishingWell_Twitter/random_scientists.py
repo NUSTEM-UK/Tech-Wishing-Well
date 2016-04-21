@@ -5,8 +5,6 @@ scienceList = [
     "@neiltyson",
     "@ProfBrianCox",
     "@RichardDawkins",
-    "@ProfBrianCox",
-    "@RichardDawkins",
     "@bengoldacre",
     "@BadAstronomer",
     "@michiokaku",
