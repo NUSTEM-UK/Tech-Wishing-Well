@@ -1,9 +1,12 @@
 # Import the necessary module: GPIO, Twython, Tim and PiCamera
 import RPi.GPIO as GPIO
-import os, time, sys
+import os, time, sys, random
 from twython import Twython
 import picamera
 from datetime import datetime
+from random_proverbs import *
+from  random_scientists import *
+from generic_tweets import *
 
 # these modules allow us to import data on the image files to be tweeted on the hour
 from stat import *
@@ -64,9 +67,9 @@ tweet_choice = 0
 light_switch(True, False, False)
 
 # the three Tweets (to rule them all)
-tweet0 = "This is the first Tweet"
-tweet1 = "This is the second Tweet"
-tweet2 = "This is the third Tweet"
+tweet0 = ""
+tweet1 = ""
+tweet2 = ""
 wishing_well_tweet = ""
 
 # write any twitter handles we want to include here
@@ -96,16 +99,16 @@ try:
         if GPIO.input(select_btn) == False:
             if tweet_choice == 0:
                 tweet_choice = 1
-                twit_message = tweet1
+                twit_message = tweetList[random.randint(0,len(tweetList))-1]
                 light_switch(False, True, False)
             elif tweet_choice == 1:
                 tweet_choice = 2
                 light_switch(False, False, True)
-                twit_message = tweet2
+                twit_message = genericList[random.randint(0,len(genericList))-1]
             else:
                 tweet_choice = 0
                 light_switch(True, False, False)
-                twit_message = tweet0
+                twit_message = scienceList[random.randint(0,len(scienceList))-1]
             debounce()
             
         # this is the if statement that takes the image to upload to twitter
