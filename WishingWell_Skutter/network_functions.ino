@@ -35,6 +35,8 @@ void reconnect() {
       client.subscribe("wishing/colour");
       client.subscribe("wishing/direction");
       client.subscribe("wishing/speed");
+      client.subscribe("wishing/transition");
+      client.subscribe("wishing/time");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());

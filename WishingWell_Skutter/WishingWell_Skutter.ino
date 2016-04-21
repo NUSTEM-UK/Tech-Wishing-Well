@@ -5,8 +5,8 @@
 
 const char* ssid = "wishingwell";
 const char* password = "thinkphysics1";
-const char* mqtt_server = "gooeypi.local"; // Test this, see if it works. If it does
-//const char* mqtt_server = "10.0.1.4";
+// const char* mqtt_server = "gooeypi.local"; // Test this, see if it works. If it does
+const char* mqtt_server = "10.0.1.3";
 
 String huzzahMACAddress;
 String skutterNameString;
@@ -116,7 +116,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if (topicString == subsTargetString) {
       Serial.println(F("Skutter target signal"));
       // Check to see if this Skutter is disabled, else enable
-      if (payloadString == "0") {
+      if (payloadString == "False") {
         active = false;
         Serial.println(F("This Skutter is now inactive"));
       } else {
