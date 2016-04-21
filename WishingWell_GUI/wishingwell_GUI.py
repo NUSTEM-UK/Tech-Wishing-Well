@@ -6,9 +6,9 @@
 #   wishing/scutter_MAC_ADDRESS         bool True / False                    #
 #   Wishing/speed                       int 0 - 100                          #
 #   wishing/colour                      hex colour code                      #
-#   wishing/time                        int >= 0                             #
+#   wishing/time                        int >= 1                             #
 #   wishing/transition                  wheel / fade                         #
-#   wishing/direction                   forwards / reverse                   #
+#   wishing/direction                   0 / 1                                #
 #                                                                            #
 ##############################################################################
 
