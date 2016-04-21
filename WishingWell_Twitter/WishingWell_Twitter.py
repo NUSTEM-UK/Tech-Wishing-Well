@@ -70,13 +70,14 @@ light_switch(True, False, False)
 tweet0 = ""
 tweet1 = ""
 tweet2 = ""
-wishing_well_tweet = ""
+wishing_well_tweet = "Come and cast your wish at the @thinkphysicsne Tech Wishing Well #makerfaireuk"
 
 # write any twitter handles we want to include here
 twit_message = tweet0
 
 #create and rotate the PiCamera
 camera = picamera.PiCamera()
+camera.led = False
 camera.rotation = 270
 camera.vflip = True
 camera.start_preview()
@@ -100,7 +101,7 @@ try:
         if GPIO.input(select_btn) == False:
             if tweet_choice == 0:
                 tweet_choice = 1
-                twit_message = proverbList[random.randint(0,len(tweetList))-1] + " #makerfaireuk"
+                twit_message = proverbList[random.randint(0,len(proverbList))-1] + " #makerfaireuk"
                 light_switch(False, True, False)
             elif tweet_choice == 1:
                 tweet_choice = 2
@@ -114,7 +115,8 @@ try:
             
         # this is the if statement that takes the image to upload to twitter
         if GPIO.input(tweet_btn) == False:
-            camera.start_preview()
+            #camera.start_preview() #do I need this piece of code?
+            camera.led = True
             time.sleep(1)
             camera.annotate_text = '3'
             time.sleep(1)
@@ -126,6 +128,7 @@ try:
             time.sleep(0.7)
             camera.annotate_text = ''
             image_path = "/home/pi/Maker_Faire_2016/TwitterImages/%s-image.jpg" % datetime.now().strftime(FORMAT)
+            camera.led = False
             camera.capture(image_path)
             photo = open(image_path, 'rb')
             response = twitter.upload_media(media = photo)
