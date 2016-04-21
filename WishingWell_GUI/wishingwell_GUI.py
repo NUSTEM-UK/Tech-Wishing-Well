@@ -175,7 +175,7 @@ class Ui_MainWindow(object):
         self.trans_time = QtGui.QSpinBox(self.gridLayoutWidget)
         self.vertical_layout_time.addWidget(self.trans_time)
         self.left_grid_layout.addLayout(self.vertical_layout_time, 7, 3, 1, 1)
-        
+        self.trans_time.setMinimum(1)
         # add the skutter update button
         self.skut_update = QtGui.QPushButton("Send Update", self.gridLayoutWidget)
         self.left_grid_layout.addWidget(self.skut_update, 8, 3, 1, 1)
@@ -234,31 +234,31 @@ class Ui_MainWindow(object):
     def skutter_update(self):
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/skutter_18:FE:34:F4:D6:F4", self.skut1.isChecked())
+        mqttc.publish("wishing/skutter_18:FE:34:F4:D6:F4", bool(self.skut1.isChecked()))
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/skutter_18:FE:34:F4:D4:79", self.skut2.isChecked())
+        mqttc.publish("wishing/skutter_18:FE:34:F4:D4:79", bool(self.skut2.isChecked()))
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/skutter_5C:CF:7F:0E:2C:EA", self.skut3.isChecked())
+        mqttc.publish("wishing/skutter_5C:CF:7F:0E:2C:EA", bool(self.skut3.isChecked()))
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/skutter_5C:CF:7F:01:59:76", self.skut4.isChecked())
+        mqttc.publish("wishing/skutter_5C:CF:7F:01:59:76", bool(self.skut4.isChecked()))
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/skutter_18:FE:34:F4:D3:BD", self.skut5.isChecked())
+        mqttc.publish("wishing/skutter_18:FE:34:F4:D3:BD", bool(self.skut5.isChecked()))
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/skutter_5C:CF:7F:01:59:5B", self.skut6.isChecked())
+        mqttc.publish("wishing/skutter_5C:CF:7F:01:59:5B", bool(self.skut6.isChecked()))
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/skutter_5C:CF:7F:0E:35:2D", self.skut7.isChecked())
+        mqttc.publish("wishing/skutter_5C:CF:7F:0E:35:2D", bool(self.skut7.isChecked()))
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/skutter_18:FE:34:FD:92:D1", self.skut8.isChecked())
+        mqttc.publish("wishing/skutter_18:FE:34:FD:92:D1", bool(self.skut8.isChecked()))
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
-        mqttc.publish("wishing/skutter_5C:CF:7F:0E:31:16", self.skut9.isChecked())
+        mqttc.publish("wishing/skutter_5C:CF:7F:0E:31:16", bool(self.skut9.isChecked()))
         self.settings_update()
         
     def settings_update(self):
@@ -296,9 +296,9 @@ class Ui_MainWindow(object):
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
         if self.clockwise.isChecked() == True:
-            mqttc.publish("wishing/direction", "True")
+            mqttc.publish("wishing/direction", 1)
         else:
-            mqttc.publish("wishing/direction", "False")
+            mqttc.publish("wishing/direction", 0)
         
     def HSVtoHEXupload(self):
         s = 1
