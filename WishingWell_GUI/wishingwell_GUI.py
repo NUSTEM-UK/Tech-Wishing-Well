@@ -19,12 +19,6 @@ import paho.mqtt.client as mqtt
 import matplotlib.colors as colors
 import colorsys
 
-# These next lines of code will eventually allow for easier input of MQTT server location and port
-# they are not yet connected to any functions within the code
-# host = 'locahost'
-# port = 1883
-# client_label = 'python_pub'   # this provides a reference on the MQTT server as to which entity published the data, in our case the GUI
-
 checkbox_status = True
 
 class Ui_MainWindow(object):
@@ -273,6 +267,9 @@ class Ui_MainWindow(object):
         mqttc.publish("wishing/time", self.trans_time.value())
         
         # publish the current hex colour
+        
+        self.HSVtoHEXupload()
+        """
         s = 1
         v = self.bright_slider.value() /100.0
         h = self.hue_slider.value() / 100.0
@@ -280,6 +277,8 @@ class Ui_MainWindow(object):
         rgb_colours = colorsys.hsv_to_rgb(h,s,v)
             #convert the RGB to HEX
         hex_colour = colors.rgb2hex((rgb_colours[0], rgb_colours[1], rgb_colours[2]))
+        """
+        
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
         mqttc.publish("wishing/colour", hex_colour)
