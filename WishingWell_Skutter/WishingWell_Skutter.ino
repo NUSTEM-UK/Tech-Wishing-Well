@@ -7,6 +7,15 @@
 //
 // Jonathan Sanderson, Northumbria University, Newcastle UK.
 // for Maker Faire UK, April 2016.
+// Code for 'Skutters' - Adafruit Huzzahs which control the servo they're mounted on, and
+// a NeoPixel RGB LED.
+// Messages passed from a local network-hosted MQTT server, controlled via the WishingWell-GUI app.
+// 
+// This code needs substantial cleanup... but it does work.
+// NB. Use v.2.2 of the Arduino ESP8266 library; v2.1 has a horrid bug which crashes with Servo.
+//
+// Jonathan Sanderson, Northumbria University, Newcastle UK.
+// for Maker Faire UK, April 2016.
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
@@ -119,36 +128,11 @@ void loop() {
     Serial.println(start_r);
     if (time_current < time_end) {
 
-      if ( target_r < start_r ) {
-        Serial.print(F("First path R "));
-        r = (int)( ((long)start_r - (long)target_r) / (long)(time_end - time_start) ) * (long)(time_current - time_start);
-        Serial.println(r);
-      } else {
-        Serial.println(F("Second path R "));
-        r = (int)( ((long)target_r - (long)start_r) / (long)(time_end - time_start) ) * (long)(time_current - time_start);
-        Serial.println(r);
-      }
 
-      if ( target_g < start_g ) {
-        Serial.print(F("First path G "));
-        g = (int)( ((long)start_g - (long)target_g) / (long)(time_end - time_start) ) * (long)(time_current - time_start);
-        Serial.println(g);
-      } else {
-        Serial.println(F("Second path G "));
-        g = (int)( ((long)target_g - (long)start_g) / (long)(time_end - time_start) ) * (long)(time_current - time_start);
-        Serial.println(g);
-      }
-
-      if ( target_b < start_b ) {
-        Serial.print(F("First path B "));
-        b = (int)( ((long)start_b - (long)target_b) / (long)(time_end - time_start) ) * (long)(time_current - time_start);
-        Serial.println(b);
-      } else {
-        Serial.println(F("Second path B "));
-        b = (int)( ((long)target_b - (long)start_b) / (long)(time_end - time_start) ) * (long)(time_current - time_start);
-        Serial.println(b);
-      }
-      
+      int interpolate(int start_value, int target_value, int start_time, int end_time, int current_time) {
+      r = interpolate(start_r, target_r, start_time, time_end, time_current);
+      g = interpolate(start_g, target_g, start_time, time_end, time_current);
+      b = interpolate(start_b, target_b, start_time, time_end, time_current);
       
       Serial.print(F("TRANSITION "));
       Serial.print(time_current - time_start);
@@ -318,6 +302,23 @@ int getServoSpeed(bool servoReverse, int selectedSpeed) {
   }
   return servo_speed;
 }
+
+int interpolate(int start_value, int target_value, int start_time, int end_time, int current_time) {
+  float start_value_float = (float) start_value;
+  float target_value_float = (float) target_value;
+  float calculated_value_float;
+  int caluclated_value_int;
+
+  if ( target_value_float < start_value_float ) {
+    calculated_value_float = ( (start_value_float - target_value_float) / (float)(end_time - start_time) * (float)(current_time - start_time);
+  } else {
+    calculated_value_float = ( (target_value_start - start_value_float) / (float)(end_time - start_time) * (float)(current_time - start_time);
+  }
+
+  calucated_value_int = (int) calculated_value_float;
+  return calculated_value_int;
+  
+}      
 
 void setNeoPixelColour(uint8_t r, uint8_t g, uint8_t b) {
   int i;
