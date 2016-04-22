@@ -15,6 +15,7 @@ import glob
 # set integers for the various buttons and LEDs
 select_btn = 17
 tweet_btn = 27
+reset_btn = 21
 t_LED = 22
 m_LED = 23
 b_LED = 24
@@ -23,6 +24,7 @@ b_LED = 24
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(select_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(tweet_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(reset_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(t_LED, GPIO.OUT)
 GPIO.setup(m_LED, GPIO.OUT)
 GPIO.setup(b_LED, GPIO.OUT)
@@ -79,7 +81,7 @@ twit_message = tweet0
 camera = picamera.PiCamera()
 camera.led = False
 camera.rotation = 270
-camera.vflip = True
+#camera.hflip = True
 camera.start_preview()
 
 
@@ -90,7 +92,7 @@ try:
         for name in files:
             st = os.stat(name)
             if st[ST_MTIME] > newfile_timestamp:
-                newfile_timestamp = st[ST_MTIME]
+                newfile_timestamp = st[SccccccT_MTIME]
                 newest_file = name
                 photo = open(newest_file, 'rb')
                 response = twitter.upload_media(media = photo)
@@ -114,7 +116,7 @@ try:
             debounce()
             
         # this is the if statement that takes the image to upload to twitter
-        if GPIO.input(tweet_btn) == False:
+        elif GPIO.input(tweet_btn) == False:
             #camera.start_preview() #do I need this piece of code?
             camera.led = True
             time.sleep(1)
@@ -135,7 +137,7 @@ try:
             twitter.update_status(status = twit_message, media_ids=[response['media_id']])
             
             debounce()
-        elif GPIO.input(tweet_btn) == False and GPIO.input(select_btn) == False:
+        elif GPIO.input(reset_btn) == True: 
             GPIO.cleanup()
             camera.stop_preview()
             sys.exit()
