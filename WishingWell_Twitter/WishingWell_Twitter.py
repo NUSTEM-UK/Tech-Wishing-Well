@@ -92,7 +92,7 @@ try:
         for name in files:
             st = os.stat(name)
             if st[ST_MTIME] > newfile_timestamp:
-                newfile_timestamp = st[SccccccT_MTIME]
+                newfile_timestamp = st[ST_MTIME]
                 newest_file = name
                 photo = open(newest_file, 'rb')
                 response = twitter.upload_media(media = photo)
@@ -131,6 +131,7 @@ try:
             camera.annotate_text = ''
             image_path = "/home/pi/Maker_Faire_2016/TwitterImages/%s-image.jpg" % datetime.now().strftime(FORMAT)
             camera.led = False
+            camera.resolution = (1360, 768)
             camera.capture(image_path)
             photo = open(image_path, 'rb')
             response = twitter.upload_media(media = photo)
