@@ -5,7 +5,7 @@
 
 const char* ssid = "wishingwell";
 const char* password = "thinkphysics1";
-// const char* mqtt_server = "gooeypi.local"; // Test this, see if it works. If it does
+// const char* mqtt_server = "gooeypi.local"; // Test this, see if it works.
 const char* mqtt_server = "10.0.1.3";
 
 String huzzahMACAddress;
