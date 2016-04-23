@@ -45,6 +45,8 @@ framedump_interval = 1000
 threshold_low = 120
 threshold_high = 160
 
+frame_brightness_threshold = 20
+
 # ------------- END OF CONFIGURATION
 
 # Runtime variables, leftover configuration, etc.
@@ -288,50 +290,55 @@ with picamera.PiCamera() as camera:
                 # Output overall brightness calculation. Later, we'll use this to 
                 # Handle flash frame discrimination
                 frame_brightness = get_brightness(frame_new)
+                if (frame_count == 1):
+                    frame_brightness_previous = frame_brightness
+                if ( abs(frame_brightness - frame_brightness_previous) < frame_brightness_threshold ):
+                    # We passed the flash test, proceed to process the image
+                    # ***** MASK PROCESSING *****
+        			# Clip low values to black (transparent)
+                    # First index the low values...
+                    low_clip_indices = frame_y < threshold_low
+                    # ...then set values at those indices to zero
+                    frame_y[low_clip_indices] = 0
+                
+                    # Clip high values to white (solid)
+                    # First index the high values...
+                    high_clip_indices = frame_y > threshold_high
+                    # ...then set values at those indices to 255
+                    frame_y[high_clip_indices] = 255
+                
+                    # Make mask image from Numpy array frame_y
+                    mask = Image.fromarray(frame_y, "L")
+                    # mask.save("mask-after.jpeg")
 
-    			#~ mask = Image.fromarray(frame_y, "L")
-    			#~ mask.save("mask-before.jpeg")
-
-                # ***** MASK PROCESSING *****
-    			# Clip low values to black (transparent)
-                # First index the low values...
-                low_clip_indices = frame_y < threshold_low
-                # ...then set values at those indices to zero
-                frame_y[low_clip_indices] = 0
+                    # ***** COMPOSITE NEW FRAME *****
+                    # Convert captured frame to RGBA
+                    frame_new = frame_new.convert("RGBA")
                 
-                # Clip high values to white (solid)
-                # First index the high values...
-                high_clip_indices = frame_y > threshold_high
-                # ...then set values at those indices to 255
-                frame_y[high_clip_indices] = 255
+                    # Combine captured frame with rolling composite, via computed mask
+                    # TODO: Check this is really doing what we think it is
+                    composite.paste(frame_new, (0,0), mask)
                 
-                # Make mask image from Numpy array frame_y
-                mask = Image.fromarray(frame_y, "L")
-                # mask.save("mask-after.jpeg")
-
-                # ***** COMPOSITE NEW FRAME *****
-                # Convert captured frame to RGBA
-                frame_new = frame_new.convert("RGBA")
+                    # Apply overlay mask
+                    composite.paste(overmask, (0,0), ImageOps.invert(overmask))
                 
-                # Combine captured frame with rolling composite, via computed mask
-                # TODO: Check this is really doing what we think it is
-                composite.paste(frame_new, (0,0), mask)
+                    # ***** DISPLAY NEW FRAME *****    
+                    raw_str = composite.tostring("raw", 'RGBA')
+                    pygame_surface = pygame.image.fromstring(raw_str, size, 'RGBA')
                 
-                # Apply overlay mask
-                composite.paste(overmask, (0,0), ImageOps.invert(overmask))
+                    # Finally, update the window
+                    screen.blit(pygame_surface, (0,0))
+                    pygame.display.flip()
                 
-                # ***** DISPLAY NEW FRAME *****    
-                raw_str = composite.tostring("raw", 'RGBA')
-                pygame_surface = pygame.image.fromstring(raw_str, size, 'RGBA')
-                
-                # Finally, update the window
-                screen.blit(pygame_surface, (0,0))
-                pygame.display.flip()
-                
-                # ***** OUTPUT FRAME STATS AND INFO *****
-                time_taken = time.time() - time_start
-                time_since_begin = time.time() - time_begin
-                print "Frame %d in %.3f secs, at %.2f fps: shutter: %d, low: %d high: %d" % (frame_count, time_taken, (frame_count/time_since_begin), camera.shutter_speed, threshold_low, threshold_high)
+                    # ***** OUTPUT FRAME STATS AND INFO *****
+                    time_taken = time.time() - time_start
+                    time_since_begin = time.time() - time_begin
+                    print "Frame %d in %.3f secs, at %.2f fps: shutter: %d, low: %d high: %d" % (frame_count, time_taken, (frame_count/time_since_begin), camera.shutter_speed, threshold_low, threshold_high)
+                    
+                    # Let frame brightness drift by frame_brightness_threshold
+                    frame_brightness_previous = frame_brightness
+                else:
+                    print "*** FLASH DETECTED - FRAME SKIPPED ***"
                 
                 frame_count += 1
                 
