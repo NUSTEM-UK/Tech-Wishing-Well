@@ -138,11 +138,12 @@ try:
             image_path = "/home/pi/Maker_Faire_2016/TwitterImages/%s-image.jpg" % datetime.now().strftime(FORMAT)
             camera.resolution = (1360, 768)
             camera.capture(image_path)
-            camera.led = False
+            #camera.led = False
             photo = open(image_path, 'rb')
             response = twitter.upload_media(media = photo)
             twitter.update_status(status = twit_message, media_ids=[response['media_id']])
             photo.close()
+            camera.led = False
             debounce()
             
         elif GPIO.input(reset_btn) == True: 
