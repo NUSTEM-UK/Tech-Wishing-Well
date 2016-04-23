@@ -7,15 +7,7 @@
 //
 // Jonathan Sanderson, Northumbria University, Newcastle UK.
 // for Maker Faire UK, April 2016.
-// Code for 'Skutters' - Adafruit Huzzahs which control the servo they're mounted on, and
-// a NeoPixel RGB LED.
-// Messages passed from a local network-hosted MQTT server, controlled via the WishingWell-GUI app.
-// 
-// This code needs substantial cleanup... but it does work.
-// NB. Use v.2.2 of the Arduino ESP8266 library; v2.1 has a horrid bug which crashes with Servo.
-//
-// Jonathan Sanderson, Northumbria University, Newcastle UK.
-// for Maker Faire UK, April 2016.
+
 
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
@@ -123,16 +115,13 @@ void loop() {
   
   if (active && in_transition) {
     time_current = millis();
-    Serial.print(target_r);
-    Serial.print(" ");
-    Serial.println(start_r);
     if (time_current < time_end) {
 
-
-      int interpolate(int start_value, int target_value, int start_time, int end_time, int current_time) {
-      r = interpolate(start_r, target_r, start_time, time_end, time_current);
-      g = interpolate(start_g, target_g, start_time, time_end, time_current);
-      b = interpolate(start_b, target_b, start_time, time_end, time_current);
+      r = interpolate(start_r, target_r, time_start, time_end, time_current);
+      g = interpolate(start_g, target_g, time_start, time_end, time_current);
+      b = interpolate(start_b, target_b, time_start, time_end, time_current);
+      
+      servo_speed = interpolate(start_speed, target_speed, time_start, time_end, time_current);
       
       Serial.print(F("TRANSITION "));
       Serial.print(time_current - time_start);
@@ -144,20 +133,30 @@ void loop() {
       Serial.print(g);
       Serial.print(F(" "));
       Serial.println(b);
-      setNeoPixelColour(r, g, b);
+      
     } else {
-      // Ensure we actually reach targets
-      setNeoPixelColour(target_r, target_g, target_b);
+      // Ensure we actually reach target
+      r = target_r;
+      g = target_g;
+      b = target_b;
 
       // Reset colours for next target
       start_r = target_r;
       start_g = target_g;
       start_b = target_b;
+      
+      // Servo speed
+      servo_speed = target_speed;
+      start_speed = target_speed;
 
       in_transition = false; // We're done; omit this path and wait for next command
       
     }
-    delay(50);
+    
+    // Make the changes
+    setNeoPixelColour(r, g, b);
+    myservo.write(servo_speed);
+    delay(20);
   }
 
 }
@@ -259,6 +258,18 @@ void callback(char* topic, byte* payload, unsigned int length) {
     Serial.print(time_start);
     Serial.print(F(" ending at "));
     Serial.println(time_end);
+    Serial.print(F("Start Colour: "));
+    Serial.print(start_r);
+    Serial.print(F(" "));
+    Serial.print(start_g);
+    Serial.print(F(" "));
+    Serial.print(start_b);
+    Serial.print(F("  Target Colour: "));
+    Serial.print(target_r);
+    Serial.print(F(" "));
+    Serial.print(target_g);
+    Serial.print(F(" "));
+    Serial.println(target_b);
   
     if (servoReverse) {
       Serial.print(F("Reverse "));
@@ -267,28 +278,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
       Serial.print(F("Forward "));
       Serial.println(servo_speed);
     }
-  
-    Serial.print(F("Colour target: "));
-    Serial.print(target_r);
-    Serial.print(F(" "));
-    Serial.print(target_g);
-    Serial.print(F(" "));
-    Serial.println(target_b);
     
     Serial.println(F("========================================"));
 
  }
 
-
-/* Handle servo speed and direction changes **********************/
-void setServoSpeed(bool servoReverse, int selectedSpeed){
-  if (servoReverse) {
-    servo_speed = 90 - selectedSpeed;
-  } else {
-    servo_speed = 90 + selectedSpeed;
-  }
-  myservo.write(servo_speed);
-}
 
 int getServoSpeed(bool servoReverse, int selectedSpeed) {
   if (servoReverse) {
@@ -307,17 +301,20 @@ int interpolate(int start_value, int target_value, int start_time, int end_time,
   float start_value_float = (float) start_value;
   float target_value_float = (float) target_value;
   float calculated_value_float;
-  int caluclated_value_int;
+  int calculated_value_int;
 
+  Serial.print(start_value_float);
+  Serial.print(" ");
+  Serial.println(target_value_float);
+  
   if ( target_value_float < start_value_float ) {
-    calculated_value_float = ( (start_value_float - target_value_float) / (float)(end_time - start_time) * (float)(current_time - start_time);
+    calculated_value_float = start_value_float + ( ( (start_value_float - target_value_float) / (float)(end_time - start_time) ) * (float)(current_time - start_time) );
   } else {
-    calculated_value_float = ( (target_value_start - start_value_float) / (float)(end_time - start_time) * (float)(current_time - start_time);
+    calculated_value_float = start_value_float - ( ( (target_value_float - start_value_float) / (float)(end_time - start_time) ) * (float)(current_time - start_time) );
   }
 
-  calucated_value_int = (int) calculated_value_float;
-  return calculated_value_int;
-  
+  calculated_value_int = (int) calculated_value_float;
+  return calculated_value_int;  
 }      
 
 void setNeoPixelColour(uint8_t r, uint8_t g, uint8_t b) {
@@ -325,15 +322,14 @@ void setNeoPixelColour(uint8_t r, uint8_t g, uint8_t b) {
   // Assume a strip of NeoPixels, even though we're likely working with just one
   for (int i = 0; i < PIXEL_COUNT; ++i) {
     strip.setPixelColor(i, r, g, b);
-    strip.setPixelColor(i, r, g, b);
-      Serial.print("Pixel ");
-      Serial.print(i);
-      Serial.print(" set to ");
-      Serial.print(r);
-      Serial.print(" ");
-      Serial.print(g);
-      Serial.print(" ");
-      Serial.println(b);
+//    Serial.print("Pixel ");
+//    Serial.print(i);
+//    Serial.print(" set to ");
+//    Serial.print(r);
+//    Serial.print(" ");
+//    Serial.print(g);
+//    Serial.print(" ");
+//    Serial.println(b);
   }
   strip.show();
 }
