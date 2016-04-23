@@ -103,41 +103,48 @@ try:
         if GPIO.input(select_btn) == False:
             if tweet_choice == 0:
                 tweet_choice = 1
-                twit_message = proverbList[random.randint(0,len(proverbList))-1] + " #makerfaireuk"
+                #twit_message = proverbList[random.randint(0,len(proverbList))-1] + " #makerfaireuk"
                 light_switch(False, True, False)
             elif tweet_choice == 1:
                 tweet_choice = 2
                 light_switch(False, False, True)
-                twit_message = genericList[random.randint(0,len(genericList))-1]
+                #twit_message = genericList[random.randint(0,len(genericList))-1]
             else:
                 tweet_choice = 0
                 light_switch(True, False, False)
-                twit_message = scienceList[random.randint(0,len(scienceList))-1] + " I'm at #makerfaireuk with my tech wish for the future!" 
+                #twit_message = scienceList[random.randint(0,len(scienceList))-1] + " I'm at #makerfaireuk with my tech wish for the future!" 
             debounce()
             
         # this is the if statement that takes the image to upload to twitter
         elif GPIO.input(tweet_btn) == False:
-            #camera.start_preview() #do I need this piece of code?
             camera.led = True
-            time.sleep(1)
+            if tweet_choice == 0:
+                twit_message = "." + scienceList[random.randint(0,len(scienceList))-1] + " I'm at #makerfaireuk with my tech wish for the future!"
+            elif tweet_choice == 1:
+                twit_message = proverbList[random.randint(0,len(proverbList))-1] + " #makerfaireuk"
+            else:
+                twit_message = genericList[random.randint(0,len(genericList))-1]
+            
+            time.sleep(0.8)
             camera.annotate_text = '3'
-            time.sleep(1)
+            time.sleep(0.8)
             camera.annotate_text = '2'
-            time.sleep(1)
+            time.sleep(0.8)
             camera.annotate_text = '1'
-            time.sleep(1)
+            time.sleep(0.8)
             camera.annotate_text = 'Smile!'
-            time.sleep(0.7)
+            time.sleep(0.)
             camera.annotate_text = ''
             image_path = "/home/pi/Maker_Faire_2016/TwitterImages/%s-image.jpg" % datetime.now().strftime(FORMAT)
-            camera.led = False
             camera.resolution = (1360, 768)
             camera.capture(image_path)
+            camera.led = False
             photo = open(image_path, 'rb')
             response = twitter.upload_media(media = photo)
             twitter.update_status(status = twit_message, media_ids=[response['media_id']])
-            
+            photo.close()
             debounce()
+            
         elif GPIO.input(reset_btn) == True: 
             GPIO.cleanup()
             camera.stop_preview()
