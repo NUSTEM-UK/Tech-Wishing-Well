@@ -5,7 +5,7 @@ from twython import Twython
 import picamera
 from datetime import datetime
 from random_proverbs import *
-from  random_scientists import *
+#from  random_scientists import *
 from generic_tweets import *
 
 # these modules allow us to import data on the image files to be tweeted on the hour
@@ -25,23 +25,23 @@ config = {}
 execfile("real_config.py", config)
 twitter = Twython(config["app_key"],config["app_secret"],config["oauth_token"],config["oauth_token_secret"])
 
-# get the time stamp of the most recent jpeg in the output folder
-files = glob.glob('/home/pi/Maker_Faire_2016/Outputs/*.jpeg')
-newfile_timestamp = 0
-newest_file = ""
+## get the time stamp of the most recent jpeg in the output folder
+#files = glob.glob('/home/pi/Maker_Faire_2016/Outputs/*.jpeg')
+#newfile_timestamp = 0
+#newest_file = ""
 
-# datetime setup to add string to an image file
+## datetime setup to add string to an image file
 FORMAT = '%Y%m%d%H%M%S'
 
 
-for name in files:
-    st = os.stat(name)
-    if st[ST_MTIME] > newfile_timestamp:
-            newfile_timestamp = st[ST_MTIME]
-            newest_file = name
+#for name in files:
+    #st = os.stat(name)
+    #if st[ST_MTIME] > newfile_timestamp:
+            #newfile_timestamp = st[ST_MTIME]
+            #newest_file = name
             
-print "The most recent file is:" + newest_file    
-print "Created at timestamp:" + str(newfile_timestamp)  
+#print "The most recent file is:" + newest_file    
+#print "Created at timestamp:" + str(newfile_timestamp)  
 
 # set the choice fucntion to 0 [it can have values 0,1,2]
 tweet_choice = 0
@@ -57,55 +57,59 @@ def debounce():
 tweet0 = ""
 tweet1 = ""
 tweet2 = ""
-wishing_well_tweet = "Come and cast your wish at the @thinkphysicsne Tech Wishing Well #bigbang"
+wishing_well_tweet = "Come and cast your wish at the @thinkphysicsne Tech Wishing Well #bigbangne"
 
 #create and rotate the PiCamera
 camera = picamera.PiCamera()
 camera.led = False
 camera.rotation = 270
-#camera.hflip = True
 camera.start_preview()
 
 
 try:
     while True:
-        
-        files = glob.glob('/home/pi/Maker_Faire_2016/Outputs/*.jpeg')
-        for name in files:
-            st = os.stat(name)
-            if st[ST_MTIME] > newfile_timestamp:
-                newfile_timestamp = st[ST_MTIME]
-                newest_file = name
-                photo = open(newest_file, 'rb')
-                response = twitter.upload_media(media = photo)
-                twitter.update_status(status = wishing_well_tweet, media_ids=[response['media_id']])
-                photo.close()
-         
-         if select_btn.is_pressed:
-         	if tweet_choice == 0:
+        #files = glob.glob('/home/pi/Maker_Faire_2016/Outputs/*.jpeg')
+        #for name in files:
+            #st = os.stat(name)
+            #if st[ST_MTIME] > newfile_timestamp:
+                #newfile_timestamp = st[ST_MTIME]
+                #newest_file = name
+                #photo = open(newest_file, 'rb')
+                #response = twitter.upload_media(media = photo)
+                #twitter.update_status(status = wishing_well_tweet, media_ids=[response['media_id']])
+                #photo.close()
+        if select_btn.is_pressed:
+            print("Select Pressed")
+            if tweet_choice == 0:
                 tweet_choice = 1
-                twit_message = proverbList[random.randint(0,len(proverbList))-1] + " #bigbang"
+                print(tweet_choice)
                 t_LED.off()
-				m_LED.on()
-				b_LED.off()
+                m_LED.on()
+                b_LED.off()
             elif tweet_choice == 1:
                 tweet_choice = 2
+                print(tweet_choice)
                 t_LED.off()
-				m_LED.off()
-				b_LED.on()                
-				twit_message = genericList[random.randint(0,len(genericList))-1]
+                m_LED.off()
+                b_LED.on()                
             else:
                 tweet_choice = 0
+                print(tweet_choice)
                 t_LED.on()
-				m_LED.off()
-				b_LED.off()
-                twit_message = scienceList[random.randint(0,len(scienceList))-1] + " I'm at #bigbang with my tech wish for the future!" 
+                m_LED.off()
+                b_LED.off()
             debounce()
-            break
-        
-        if tweet_btn.is_pressed:
-        #camera.start_preview() #do I need this piece of code?
+            #break
+        elif tweet_btn.is_pressed:
+            print("Select Pressed")
             camera.led = True
+            if tweet_choice == 0:
+                twit_message = proverbList[random.randint(0,len(proverbList))-1] + " #bigbangne"
+            elif tweet_choice == 1:
+                twit_message = genericList[random.randint(0,len(genericList))-1]
+            else:
+                twit_message = proverbList[random.randint(0,len(proverbList))-1] + " I'm at #bigbangne with my tech wish for the future!" 
+            
             time.sleep(1)
             camera.annotate_text = '3'
             time.sleep(1)
@@ -123,18 +127,17 @@ try:
             photo = open(image_path, 'rb')
             response = twitter.upload_media(media = photo)
             twitter.update_status(status = twit_message, media_ids=[response['media_id']])
-            
             debounce()
-            break
-        
-        if reset_btn.is_pressed:
-            GPIO.cleanup()
-            camera.stop_preview()
-            sys.exit()
+            #break
+        elif reset_btn.is_pressed:
+			#camera.stop_preview()
+			print("Fail")
+			sys.exit()
 
 finally:
+    print("Oh dear")
     # cleanup the GPIO pins on keyboard interupt
-    GPIO.cleanup()
+    #GPIO.cleanup()
     # stop the camera preview on keyboard interupt
     camera.stop_preview()
 
