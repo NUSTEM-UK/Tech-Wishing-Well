@@ -99,7 +99,6 @@ try:
                 m_LED.off()
                 b_LED.off()
             debounce()
-            #break
         elif tweet_btn.is_pressed:
             print("Select Pressed")
             camera.led = True
@@ -128,9 +127,7 @@ try:
             response = twitter.upload_media(media = photo)
             twitter.update_status(status = twit_message, media_ids=[response['media_id']])
             debounce()
-            #break
         elif reset_btn.is_pressed:
-			#camera.stop_preview()
 			print("Fail")
 			sys.exit()
 
