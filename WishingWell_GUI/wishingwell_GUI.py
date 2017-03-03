@@ -12,6 +12,12 @@
 #                                                                            #
 ##############################################################################
 
+# Install: needs:
+# sudo pip install paho-mqtt
+# sudo apt install python-matplotlib 
+# Requires a *local* mqtt broker, for example via:
+# sudo apt install mosquitto
+
 from PyQt4 import QtCore, QtGui
 import paho.mqtt.client as mqtt
 
@@ -269,7 +275,7 @@ class Ui_MainWindow(object):
         # publish the current hex colour
         
         self.HSVtoHEXupload()
-        """
+        
         s = 1
         v = self.bright_slider.value() /100.0
         h = self.hue_slider.value() / 100.0
@@ -277,7 +283,7 @@ class Ui_MainWindow(object):
         rgb_colours = colorsys.hsv_to_rgb(h,s,v)
             #convert the RGB to HEX
         hex_colour = colors.rgb2hex((rgb_colours[0], rgb_colours[1], rgb_colours[2]))
-        """
+        
         
         mqttc = mqtt.Client("python_pub")
         mqttc.connect('localhost', 1883)
