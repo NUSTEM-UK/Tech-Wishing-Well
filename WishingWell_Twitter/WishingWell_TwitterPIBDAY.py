@@ -95,7 +95,7 @@ def LEDconfig(location):
         topLED.off()
         middleLED.on()
         bottomLED.off()
-        message = "Looking forward to @makerfaireuk 2017 on the 1st and 2nd April in Newcastle!"
+        message = "Looking forward to @makerfaire_uk 2017 on the 1st and 2nd April in Newcastle!"
         return message
     else:
         topLED.off()
