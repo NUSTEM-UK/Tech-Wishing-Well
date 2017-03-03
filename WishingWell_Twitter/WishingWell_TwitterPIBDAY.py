@@ -27,7 +27,7 @@ bottomLED = LED(6)
 topLED.on()
 middleLED.off()
 bottomLED.off()
-message = "Having a blast @raspberrypi birthday bash 2017!"
+message = "Having a blast @raspberry_pi birthday bash 2017!"
 location = 1
 
 # config the Twitter API client
@@ -58,15 +58,14 @@ def tww_image_getter():
 
 def take_photo():
     camera.led = True
-    time.sleep(1)
     camera.annotate_text = '3'
-    time.sleep(1)
-    camera.annotate_text = '2'
-    time.sleep(1)
-    camera.annotate_text = '1'
-    time.sleep(1)
-    camera.annotate_text = 'Smile!'
     time.sleep(0.7)
+    camera.annotate_text = '2'
+    time.sleep(0.7)
+    camera.annotate_text = '1'
+    time.sleep(0.7)
+    camera.annotate_text = 'Smile!'
+    time.sleep(0.1)
     camera.annotate_text = ''
     camera.led = False
     camera.resolution = (1360, 768)
@@ -84,13 +83,13 @@ def twitter_upload(message, filep):
         print("Done uploading")
     except Twythonerror as e:
         print(e.error_code)
-        
+
 def LEDconfig(location):
     if location == 1:
         topLED.on()
         middleLED.off()
         bottomLED.off()
-        message = "Having a blast @raspberrypi birthday bash 2017!"
+        message = "Having a blast @raspberry_pi birthday bash 2017!"
         return message
     elif location == 2:
         topLED.off()
@@ -111,7 +110,7 @@ try:
             print("Pressed 1")
             take_photo()
             twitter_upload(message, "picamimg.jpg")
-            
+
         elif selectButton.is_pressed:
             print("Pressed 2")
             time.sleep(0.2)
