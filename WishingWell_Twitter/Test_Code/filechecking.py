@@ -17,10 +17,10 @@ try:
             for name in test:
                 st = os.stat(name)
                 if st[ST_MTIME] > newfile_timestamp:    #ST_MTIME - last modified
-                        newfile_timestamp = st[ST_MTIME]
-                        newest_file = name
-                        print newfile_timestamp
-                        print newest_file
+                    newfile_timestamp = st[ST_MTIME]
+                    newest_file = name
+                    print newfile_timestamp
+                    print newest_file
         finally:
             print "bugger"
             time.sleep(2)
