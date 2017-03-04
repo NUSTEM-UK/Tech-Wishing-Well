@@ -86,17 +86,17 @@ def take_photo():
     topLED.on()
     middleLED.off()
     bottomLED.off()
-    time.sleep(0.7)
+    time.sleep(1)
     camera.annotate_text = '2'
     topLED.on()
     middleLED.on()
     bottomLED.off()
-    time.sleep(0.7)
+    time.sleep(1)
     camera.annotate_text = '1'
     topLED.on()
     middleLED.on()
     bottomLED.on()
-    time.sleep(0.7)
+    time.sleep(1)
     camera.annotate_text = 'Smile!'
     time.sleep(0.1)
     camera.annotate_text = ''
