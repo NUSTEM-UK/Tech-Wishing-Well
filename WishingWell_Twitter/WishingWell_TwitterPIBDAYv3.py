@@ -53,7 +53,7 @@ def LEDconfig(whichlight):
         tweet = "random"
         return tweet
 
-def flasher(whichlight):
+def flasher():
     for i in range(3):
         topLED.on()
         bottomLED.on()
@@ -63,8 +63,7 @@ def flasher(whichlight):
         bottomLED.on()
         middleLED.on()
         time.sleep(0.2)
-    ledconfig(whichlight)
-    
+
 
 def tww_image_getter(nf_timestamp):
     try:
@@ -127,8 +126,9 @@ def main():
             if snapButton.is_pressed:
                 print("Snap...")
                 take_photo()
-                flasher(location)
+                flasher()
                 twitter_upload(message, "picamimg.jpg")
+                LEDconfig(location)
 
             elif selectButton.is_pressed:
                 print("Change selection...")
