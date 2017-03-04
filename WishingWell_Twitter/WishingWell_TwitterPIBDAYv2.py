@@ -81,7 +81,7 @@ def LEDconfig(whichlight):
         topLED.on()
         middleLED.off()
         bottomLED.off()
-        tweet = "Having a blast @raspberry_pi birthday bash 2017!"
+        tweet = "Having a blast at the #piparty birthday bash 2017!"
         return tweet
     elif whichlight == 2:
         topLED.off()
@@ -101,7 +101,7 @@ def main():
     topLED.on()
     middleLED.off()
     bottomLED.off()
-    message = "Having a blast @raspberry_pi birthday bash 2017!"
+    message = "Having a blast at the #PiParty birthday bash 2017!"
     location = 1
     newfile_timestamp = 0
 

@@ -1,6 +1,6 @@
 #Details for Twitter
 
-app_key = "9EpKmsuYBXs115n8vSODZrCU0"
-app_secret = "krsco1y756Ik8cuMi96aQOjgrrIXjQSYS4xljRd44WhCXysUIt"
-oauth_token = "718059190644826112-KkhWa04DGu0rpOGVgQiHTFOp1JlJNJ2"
-oauth_token_secret = "GamxfRNBmnHOiZ9IPZx6jnJSTjn7vPUn0UbtaF5DXOoKV"
+app_key = "g9vG9gVhLMdPkToG4FoeaUXc3"
+app_secret = "bgvTm0kTSXvInvItECNh0d8V3bbHF2HGuLYqMkv4wd1KwEalsa"
+oauth_token = "718059190644826112-EkhawuhFZ9wMC8YKSLHMr8131vquync"
+oauth_token_secret = "P7Gx1LN1ddf9ZJwSJvLJQO6l3TKwbkMwYYt32TFZdI00z"

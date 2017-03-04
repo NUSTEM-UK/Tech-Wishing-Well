@@ -81,7 +81,7 @@ def twitter_upload(message, filep):
     try:
         twitter.update_status(status = message, media_ids=[response['media_id']])
         print("Done uploading")
-    except Twythonerror as e:
+    except TwythonError as e:
         print(e.error_code)
 
 def LEDconfig(location):
