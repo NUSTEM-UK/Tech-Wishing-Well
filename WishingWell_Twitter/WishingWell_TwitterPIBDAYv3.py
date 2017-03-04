@@ -14,23 +14,23 @@ from random_proverbs import proverbList
 
 
 # define the pins for the buttons
-snapButton = Button(24,bounce_time=1)
-selectButton= Button(23,bounce_time=1)
+snapButton = Button(24, bounce_time=1)
+selectButton = Button(23, bounce_time=1)
 
 # define the pins for the LEDs
-topLED=LED(13)
-middleLED=LED(5)
-bottomLED =LED(6)
+topLED = LED(13)
+middleLED = LED(5)
+bottomLED = LED(6)
 
 # config the Twitter API client
-config= {}
+config = {}
 execfile("realconfig.py", config)
 twitter = Twython(config["app_key"], config["app_secret"], config["oauth_token"], config["oauth_token_secret"])
 
 # config the camera
-camera= picamera.PiCamera()
-camera.led= False
-camera.resolution= (1360, 768)
+camera = picamera.PiCamera()
+camera.led = False
+camera.resolution = (1360, 768)
 camera.start_preview()
 
 def LEDconfig(whichlight):
@@ -38,13 +38,15 @@ def LEDconfig(whichlight):
         topLED.on()
         middleLED.off()
         bottomLED.off()
-        tweet = "Having a blast at the #piparty birthday bash 2017!"
+        tweet = "random"
+        # tweet = "Having a blast at the #piparty birthday bash 2017!"
         return tweet
     elif whichlight == 2:
         topLED.off()
         middleLED.on()
         bottomLED.off()
-        tweet = "Looking forward to @makerfaire_uk 2017 on the 1st and 2nd April in Newcastle!"
+        tweet = "random"
+        # tweet = "Looking forward to @makerfaire_uk 2017 on the 1st and 2nd April in Newcastle!"
         return tweet
     else:
         topLED.off()
@@ -71,10 +73,10 @@ def tww_image_getter(nf_timestamp):
         for name in files:
             st = os.stat(name)
             if st[ST_MTIME] > nf_timestamp:
-                nf_timestamp= st[ST_MTIME]
-                photo= open(name, 'rb')
-                response= twitter.upload_media(media= photo)
-                twitter.update_status(status = "Behold the beauty of the Tech Wishing Well. Thanks for all your contributions so far!", media_ids=[response['media_id']])
+                nf_timestamp = st[ST_MTIME]
+                photo = open(name, 'rb')
+                response = twitter.upload_media(media=photo)
+                twitter.update_status(status="Behold the beauty of the Tech Wishing Well. Thanks for all your contributions so far!", media_ids=[response['media_id']])
                 photo.close()
                 return nf_timestamp
     except:
@@ -108,15 +110,15 @@ def take_photo():
 
 def twitter_upload(message, filep):
     if message == "random":
-        message = proverbList[random.randint(0,len(proverbList))-1] + ". Wow this Tech Wishing Well is deep!"
+        message = proverbList[random.randint(0, len(proverbList))-1] + ". Wow the Tech Wishing Well at the #PiParty is wise!"
     photo = open(filep, 'rb')
-    response = twitter.upload_media(media = photo)
+    response = twitter.upload_media(media=photo)
     print("Uploading tweet...")
     try:
-        twitter.update_status(status = message, media_ids=[response['media_id']])
+        twitter.update_status(status=message, media_ids=[response['media_id']])
         print("Upload successful")
-    except TwythonError as e:
-        print(e.error_code)
+    except TwythonError as error:
+        print(error.error_code)
 
 
 
@@ -125,7 +127,8 @@ def main():
     topLED.on()
     middleLED.off()
     bottomLED.off()
-    message = "Having a blast at the #PiParty birthday bash 2017!"
+    message = "random"
+    # message = "Having a blast at the #PiParty birthday bash 2017!"
     location = 1
     newfile_timestamp = 0
 
