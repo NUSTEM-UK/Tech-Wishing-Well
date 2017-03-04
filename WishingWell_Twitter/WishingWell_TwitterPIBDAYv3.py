@@ -83,10 +83,19 @@ def tww_image_getter(nf_timestamp):
 def take_photo():
     camera.led = True
     camera.annotate_text = '3'
+    topLED.on()
+    middleLED.off()
+    bottomLED.off()
     time.sleep(0.7)
     camera.annotate_text = '2'
+    topLED.on()
+    middleLED.on()
+    bottomLED.off()
     time.sleep(0.7)
     camera.annotate_text = '1'
+    topLED.on()
+    middleLED.on()
+    bottomLED.on()
     time.sleep(0.7)
     camera.annotate_text = 'Smile!'
     time.sleep(0.1)
