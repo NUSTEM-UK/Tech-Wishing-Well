@@ -33,6 +33,38 @@ camera.led= False
 camera.resolution= (1360, 768)
 camera.start_preview()
 
+def LEDconfig(whichlight):
+    if whichlight == 1:
+        topLED.on()
+        middleLED.off()
+        bottomLED.off()
+        tweet = "Having a blast at the #piparty birthday bash 2017!"
+        return tweet
+    elif whichlight == 2:
+        topLED.off()
+        middleLED.on()
+        bottomLED.off()
+        tweet = "Looking forward to @makerfaire_uk 2017 on the 1st and 2nd April in Newcastle!"
+        return tweet
+    else:
+        topLED.off()
+        middleLED.off()
+        bottomLED.on()
+        tweet = "random"
+        return tweet
+
+def flasher(whichlight):
+    for i in range(3):
+        topLED.on()
+        bottomLED.on()
+        middleLED.on()
+        time.sleep(0.2)
+        topLED.on()
+        bottomLED.on()
+        middleLED.on()
+        time.sleep(0.2)
+    ledconfig(whichlight)
+    
 
 def tww_image_getter(nf_timestamp):
     try:
@@ -78,25 +110,7 @@ def twitter_upload(message, filep):
     except TwythonError as e:
         print(e.error_code)
 
-def LEDconfig(whichlight):
-    if whichlight == 1:
-        topLED.on()
-        middleLED.off()
-        bottomLED.off()
-        tweet = "Having a blast at the #piparty birthday bash 2017!"
-        return tweet
-    elif whichlight == 2:
-        topLED.off()
-        middleLED.on()
-        bottomLED.off()
-        tweet = "Looking forward to @makerfaire_uk 2017 on the 1st and 2nd April in Newcastle!"
-        return tweet
-    else:
-        topLED.off()
-        middleLED.off()
-        bottomLED.on()
-        tweet = "random"
-        return tweet
+
 
 def main():
     # initial message and light config
@@ -113,6 +127,7 @@ def main():
             if snapButton.is_pressed:
                 print("Snap...")
                 take_photo()
+                flasher(location)
                 twitter_upload(message, "picamimg.jpg")
 
             elif selectButton.is_pressed:
