@@ -59,9 +59,9 @@ def flasher():
         bottomLED.on()
         middleLED.on()
         time.sleep(0.2)
-        topLED.on()
-        bottomLED.on()
-        middleLED.on()
+        topLED.off()
+        bottomLED.off()
+        middleLED.off()
         time.sleep(0.2)
 
 
