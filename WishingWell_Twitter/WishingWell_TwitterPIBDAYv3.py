@@ -14,8 +14,8 @@ from random_proverbs import proverbList
 
 
 # define the pins for the buttons
-snapButton = Button(24, bounce_time=1)
-selectButton = Button(23, bounce_time=1)
+snapButton = Button(24, bounce_time=0.02)
+selectButton = Button(23, bounce_time=0.02)
 
 # define the pins for the LEDs
 topLED = LED(13)
@@ -144,7 +144,7 @@ def main():
 
             elif selectButton.is_pressed:
                 print("Change selection...")
-                time.sleep(0.2)
+                #time.sleep(0.2)
                 if location == 1:
                     message = LEDconfig(1)
                     print(message)
