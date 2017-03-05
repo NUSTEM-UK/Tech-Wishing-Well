@@ -1,150 +1,164 @@
-# Import the necessary module: GPIO, Twython, Tim and PiCamera
-import RPi.GPIO as GPIO
-import os, time, sys, random
-from twython import Twython
-import picamera
-from datetime import datetime
-from random_proverbs import *
-from  random_scientists import *
-from generic_tweets import *
-
-# these modules allow us to import data on the image files to be tweeted on the hour
-from stat import *
+#!/usr/bin/env python3
+""" This script allows the user to take a photo and to upload load it with a
+user-selected tweet."""
+import time
 import glob
+import os
+import random
+from stat import ST_MTIME
+from gpiozero import LED, Button
+from twython import Twython, TwythonError
+import picamera
+from random_proverbs import proverbList
 
-# set integers for the various buttons and LEDs
-select_btn = 17
-tweet_btn = 27
-reset_btn = 21
-t_LED = 22
-m_LED = 23
-b_LED = 24
 
-# set the inputs and outputs from the PiGPIO
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(select_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(tweet_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(reset_btn, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.setup(t_LED, GPIO.OUT)
-GPIO.setup(m_LED, GPIO.OUT)
-GPIO.setup(b_LED, GPIO.OUT)
 
-# open and load the config file for the Twitter client (Twython)
+# define the pins for the buttons
+snapButton = Button(24)
+selectButton = Button(23)
+
+# define the pins for the LEDs
+topLED = LED(13)
+middleLED = LED(5)
+bottomLED = LED(6)
+
+# config the Twitter API client
 config = {}
-execfile("real_config.py", config)
-twitter = Twython(config["app_key"],config["app_secret"],config["oauth_token"],config["oauth_token_secret"])
+execfile("realconfig.py", config)
+twitter = Twython(config["app_key"], config["app_secret"], config["oauth_token"], config["oauth_token_secret"])
 
-# get the time stamp of the most recent jpeg in the output folder
-files = glob.glob('/home/pi/Maker_Faire_2016/Outputs/*.jpeg')
-newfile_timestamp = 0
-newest_file = ""
-#print files
-
-# datetime setup to add string to an image file
-FORMAT = '%Y%m%d%H%M%S'
-
-
-for name in files:
-    st = os.stat(name)
-    if st[ST_MTIME] > newfile_timestamp:
-            newfile_timestamp = st[ST_MTIME]
-            newest_file = name
-            
-print "The most recent file is:" + newest_file    
-print "Created at timestamp:" + str(newfile_timestamp)       
-
-
-# this is the button debounce function
-def debounce():
-    time.sleep(0.4)
-    
-# this is the function that allows lights to be turned on or off in combo 
-def light_switch(top, middle, bottom):
-    GPIO.output(t_LED, top)
-    GPIO.output(m_LED, middle)
-    GPIO.output(b_LED, bottom)
-    
-# set the choice fucntion to 0 [it can have values 0,1,2]
-tweet_choice = 0
-light_switch(True, False, False)
-
-# the three Tweets (to rule them all)
-tweet0 = ""
-tweet1 = ""
-tweet2 = ""
-wishing_well_tweet = "Come and cast your wish at the @thinkphysicsne Tech Wishing Well #makerfaireuk"
-
-# write any twitter handles we want to include here
-twit_message = tweet0
-
-#create and rotate the PiCamera
+# config the camera
 camera = picamera.PiCamera()
 camera.led = False
-camera.rotation = 270
-#camera.hflip = True
+camera.resolution = (1360, 768)
 camera.start_preview()
 
+def LEDconfig(whichlight):
+    if whichlight == 1:
+        topLED.on()
+        middleLED.off()
+        bottomLED.off()
+        tweet = "random"
+        # tweet = "Having a blast at the #piparty birthday bash 2017!"
+        return tweet
+    elif whichlight == 2:
+        topLED.off()
+        middleLED.on()
+        bottomLED.off()
+        tweet = "random"
+        # tweet = "Looking forward to @makerfaire_uk 2017 on the 1st and 2nd April in Newcastle!"
+        return tweet
+    else:
+        topLED.off()
+        middleLED.off()
+        bottomLED.on()
+        tweet = "random"
+        return tweet
 
-try:
-    while True:
-        
+def flasher():
+    for i in range(3):
+        topLED.on()
+        bottomLED.on()
+        middleLED.on()
+        time.sleep(0.2)
+        topLED.off()
+        bottomLED.off()
+        middleLED.off()
+        time.sleep(0.2)
+
+
+def tww_image_getter(nf_timestamp):
+    try:
         files = glob.glob('/home/pi/Maker_Faire_2016/Outputs/*.jpeg')
         for name in files:
             st = os.stat(name)
-            if st[ST_MTIME] > newfile_timestamp:
-                newfile_timestamp = st[ST_MTIME]
-                newest_file = name
-                photo = open(newest_file, 'rb')
-                response = twitter.upload_media(media = photo)
-                twitter.update_status(status = wishing_well_tweet, media_ids=[response['media_id']])
+            if st[ST_MTIME] > nf_timestamp:
+                nf_timestamp = st[ST_MTIME]
+                photo = open(name, 'rb')
+                response = twitter.upload_media(media=photo)
+                twitter.update_status(status="Behold the beauty of the Tech Wishing Well. Thanks for all your contributions so far!", media_ids=[response['media_id']])
                 photo.close()
-        
-            
-        if GPIO.input(select_btn) == False:
-            if tweet_choice == 0:
-                tweet_choice = 1
-                twit_message = proverbList[random.randint(0,len(proverbList))-1] + " #makerfaireuk"
-                light_switch(False, True, False)
-            elif tweet_choice == 1:
-                tweet_choice = 2
-                light_switch(False, False, True)
-                twit_message = genericList[random.randint(0,len(genericList))-1]
-            else:
-                tweet_choice = 0
-                light_switch(True, False, False)
-                twit_message = scienceList[random.randint(0,len(scienceList))-1] + " I'm at #makerfaireuk with my tech wish for the future!" 
-            debounce()
-            
-        # this is the if statement that takes the image to upload to twitter
-        elif GPIO.input(tweet_btn) == False:
-            #camera.start_preview() #do I need this piece of code?
-            camera.led = True
-            time.sleep(1)
-            camera.annotate_text = '3'
-            time.sleep(1)
-            camera.annotate_text = '2'
-            time.sleep(1)
-            camera.annotate_text = '1'
-            time.sleep(1)
-            camera.annotate_text = 'Smile!'
-            time.sleep(0.7)
-            camera.annotate_text = ''
-            image_path = "/home/pi/Maker_Faire_2016/TwitterImages/%s-image.jpg" % datetime.now().strftime(FORMAT)
-            camera.led = False
-            camera.resolution = (1360, 768)
-            camera.capture(image_path)
-            photo = open(image_path, 'rb')
-            response = twitter.upload_media(media = photo)
-            twitter.update_status(status = twit_message, media_ids=[response['media_id']])
-            
-            debounce()
-        elif GPIO.input(reset_btn) == True: 
-            GPIO.cleanup()
-            camera.stop_preview()
-            sys.exit()
-finally:
-    # cleanup the GPIO pins on keyboard interupt
-    GPIO.cleanup()
-    # stop the camera preview on keyboard interupt
-    camera.stop_preview()
+                return nf_timestamp
+    except:
+        pass
 
+def take_photo():
+    camera.led = True
+    camera.annotate_text = '3'
+    topLED.on()
+    middleLED.off()
+    bottomLED.off()
+    time.sleep(1)
+    camera.annotate_text = '2'
+    topLED.on()
+    middleLED.on()
+    bottomLED.off()
+    time.sleep(1)
+    camera.annotate_text = '1'
+    topLED.on()
+    middleLED.on()
+    bottomLED.on()
+    time.sleep(1)
+    camera.annotate_text = 'Smile!'
+    time.sleep(0.1)
+    camera.annotate_text = ''
+    camera.led = False
+
+    print("Taking photo")
+    camera.capture("picamimg.jpg")
+    print("Photo done!")
+
+def twitter_upload(message, filep):
+    if message == "random":
+        message = proverbList[random.randint(0, len(proverbList))-1] + ". Wow the Tech Wishing Well at the #PiParty is wise!"
+    photo = open(filep, 'rb')
+    response = twitter.upload_media(media=photo)
+    print("Uploading tweet...")
+    try:
+        twitter.update_status(status=message, media_ids=[response['media_id']])
+        print("Upload successful")
+    except TwythonError as error:
+        print(error.error_code)
+
+
+
+def main():
+    # initial message and light config
+    topLED.on()
+    middleLED.off()
+    bottomLED.off()
+    message = "random"
+    # message = "Having a blast at the #PiParty birthday bash 2017!"
+    location = 1
+    newfile_timestamp = 0
+
+    try:
+        while True:
+            #newfile_timestamp = tww_image_getter(newfile_timestamp)
+            if snapButton.is_pressed:
+                print("Snap...")
+                take_photo()
+                flasher()
+                twitter_upload(message, "picamimg.jpg")
+                LEDconfig(location)
+
+            elif selectButton.is_pressed:
+                print("Change selection...")
+                time.sleep(0.2)
+                if location == 1:
+                    message = LEDconfig(1)
+                    print(message)
+                    location = 2
+                elif location == 2:
+                    message = LEDconfig(2)
+                    print(message)
+                    location = 3
+                else:
+                    message = LEDconfig(3)
+                    print(message)
+                    location = 1
+    finally:
+        camera.stop_preview()
+
+if __name__ == '__main__':
+    main()
