@@ -6,14 +6,27 @@ from picamera.array import PiRGBArray
 from picamera import PiCamera
 
 camera = PiCamera()
-camera.resolution = (640, 360)
-rawCapture = PiRGBArray(camera, size=(640, 360))
+# set capture resolution. Multiples of 16, typically!
+width, height = (864, 864)
+camera.resolution = (width, height)
+#Note that array size arguments are the other way around to the camera resolution. Just to catch you out.
+rawCapture = PiRGBArray(camera, size=(height, width))
+camera.framerate = 15
 time.sleep(0.1)
 
-START = time()
-#cycle through the stream of images from the camera
-for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-    image = frame.array #the frame will be stroed in the varible called image
+time_begin = time.time()
+time_start = time.time()
+frame_count = 0
+
+# through the stream of images from the camera
+for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=True):
+    image = frame.array #the frame will be stored in the varible called image
 	#add your processing code here to process the image array
-    elapsed = time() - start
-    print(elapsed)
+    time_taken = time.time() - time_start
+    time_since_begin = time.time() - time_begin
+    print("Frame %d captured in %.3f secs, at %.2f fps" % (frame_count, time_taken, (frame_count / time_since_begin) ) )
+    # Clear the buffer!
+    rawCapture.truncate(0)
+    time_start = time.time()
+    frame_count += 1
+
