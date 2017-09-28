@@ -23,18 +23,18 @@ script, file_prefix = argv
 # But we're not doing the post-crop, so... stick with %32 sizes
 # Good sizes are 736, 800, 864, 896, 928, 960, 1024, 1056
 # Best frame-rate compromise for a 1920x1080 display is probably 864 
-size = width, height = 864, 864
+size = width, height = 736, 736
 # Should we display full screen, or windowed?
 full_screen = 1
 
 # Video settings
 # Keep the video_framerate low to allow longer shutter speeds.
 # Also, faster shutter speeds slow the whole system down. It's not clear why.
-video_framerate = 3
+video_framerate = 4
 # Juggle these a little - need buffer to be full before we start processing
 # frames, so prerecord_seconds should not be shorter than buffer_length
-buffer_length = 2
-prerecord_seconds = 2
+buffer_length = 3
+prerecord_seconds = 4
 
 # Set output directory for manual and automatic framedumps
 output_directory = "/home/pi/outputs"
