@@ -130,11 +130,11 @@ class ProcessOutput(object):
                 if self.pool:
                     self.processor = self.pool.pop()
                 else:
-                    # No processor's available, we'll have to skip
+                    # No processors available, we'll have to skip
                     # this frame; you may want to print a warning
                     # here to see whether you hit this case 
                     self.processor = None
-                    print(">>> NO PROCSSOR: Frame skip")
+                    print(">>> NO PROCESSOR: Frame skip")
         if self.processor:
             self.processor.stream.write(buf)
 
