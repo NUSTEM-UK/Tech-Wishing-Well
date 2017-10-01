@@ -1,3 +1,4 @@
+"""Test script for camera function and alignment."""
 import time
 import picamera
 

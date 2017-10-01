@@ -14,8 +14,8 @@
 #include <Servo.h>
 #include <Adafruit_NeoPixel.h>
 
-const char* ssid = "wishingwell";
-const char* password = "thinkphysics1";
+const char* ssid = "nustem";
+const char* password = "nustem123";
 // const char* mqtt_server = "gooeypi.local"; // Test this, see if it works.
 const char* mqtt_server = "10.0.1.3";
 

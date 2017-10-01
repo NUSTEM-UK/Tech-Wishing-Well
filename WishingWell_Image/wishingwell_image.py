@@ -8,21 +8,23 @@
 # TODO: Investigate Numpy array use directly within Pygame
 # TODO: Investigate alpha.composite in PIL 2
 
-import io, time, sys
+# import io
+import time
+import sys
+from sys import argv
 import pygame
 import picamera
 import picamera.array
 from PIL import Image, ImageStat, ImageOps, ImageDraw
 import numpy as np
 import os.path
-from sys import argv
 
 script, file_prefix = argv
 
 # Set working frame size (multiples of 32h, 16v -- or padded to these)
 # But we're not doing the post-crop, so... stick with %32 sizes
 # Good sizes are 736, 800, 864, 896, 928, 960, 1024, 1056
-# Best frame-rate compromise for a 1920x1080 display is probably 864 
+# Best frame-rate compromise for a 1920x1080 display is probably 864
 size = width, height = 864, 864
 # Should we display full screen, or windowed?
 full_screen = 1
@@ -49,8 +51,8 @@ threshold_high = 160
 
 # Runtime variables, leftover configuration, etc.
 output_mode = 1
-shutter_max = (1.0/video_framerate) * 1000000  # microsec exposure for shutter setting
-shutter_min = 1000              			   # microsec exposure for shutter setting
+shutter_max = (1.0/video_framerate) * 1000000  # microsec exposure for shutter
+shutter_min = 1000              			   # microsec exposure for shutter
 video_rotation = 180
 video_port = True
 video_stabilization = False
@@ -78,30 +80,34 @@ pygame_surface = pygame.image.fromstring(raw_str, size, 'RGBA')
 # Set up overlay mask image
 # Oversize so it anti-aliases on scaledown
 overmask_size = (width * 3, height *3)
-overmask_centre = [ overmask_size[0] / 2 , overmask_size[1] / 2 ]
-overmask_radius = overmask_size[0] /2 
+overmask_centre = [overmask_size[0]/2, overmask_size[1]/2]
+overmask_radius = overmask_size[0]/2
 
-def drawOvermask():
+
+def draw_overmask():
+    """Render circular black overlay."""
     global overmask
     global overmask_size
     global overmask_radius
     global overmask_centre
     overmask = Image.new('L', overmask_size, 0)
     draw = ImageDraw.Draw(overmask)
-    draw.ellipse (  (
+    draw.ellipse((
         (overmask_centre[0] - overmask_radius),
         (overmask_centre[1] - overmask_radius),
         (overmask_centre[0] + overmask_radius),
-        (overmask_centre[1] + overmask_radius) ), fill = 255)
+        (overmask_centre[1] + overmask_radius)), fill = 255)
     overmask = overmask.resize(size, Image.ANTIALIAS)
 
 
 def get_brightness(image):
-    """Return overall brightness value for image"""
+    """Return overall brightness value for image."""
     stat = ImageStat.Stat(image)
     return stat.rms[0]
 
+
 def framedump():
+    """Output current frame to (pre-determined) filepath."""
     global file_prefix
     global frame_count
     global output_directory
@@ -111,7 +117,9 @@ def framedump():
     composite.save(filename)
     print "Frame saved as %s" % framedump_name
 
+
 def handlePygameEvents():
+    """Respond to keyboard input."""
     global threshold_low
     global threshold_high
     global output_mode
@@ -160,30 +168,30 @@ def handlePygameEvents():
                     pygame.mouse.set_visible(0)
                 full_screen = not full_screen
             elif key_press == pygame.K_i:
-                if ( overmask_centre[1] - 10 ) > 0:
+                if (overmask_centre[1]-10) > 0:
                     overmask_centre[1] -= 10
-                    drawOvermask()
+                    draw_overmask()
             elif key_press == pygame.K_k:
-                if ( overmask_centre[1] + 10 ) < overmask_size[1]:
+                if (overmask_centre[1]+10) < overmask_size[1]:
                     overmask_centre[1] += 10
-                    drawOvermask()
+                    draw_overmask()
             elif key_press == pygame.K_j:
                 if ( overmask_centre[0] - 10 ) > 0:
                     overmask_centre[0] -= 10
-                    drawOvermask()
+                    draw_overmask()
             elif key_press == pygame.K_l:
-                if ( overmask_centre[0] + 10 ) < overmask_size[0]:
+                if (overmask_centre[0]+10) < overmask_size[0]:
                     overmask_centre[0] += 10
-                    drawOvermask()
+                    draw_overmask()
             elif key_press == pygame.K_y:
                 overmask_radius += 10
-                drawOvermask()
+                draw_overmask()
             elif key_press == pygame.K_h:
                 overmask_radius -= 10
-                drawOvermask()
+                draw_overmask()
             elif key_press == pygame.K_o:
                 framedump()
-            
+
             # Check for left shift and allow rapid threshold changes
             if pygame.key.get_mods() & pygame.KMOD_LSHIFT:
                 if key_press == pygame.K_q:
@@ -225,12 +233,12 @@ with picamera.PiCamera() as camera:
     camera.video_stabilization = video_stabilization
     # camera.annotate_background = video_annotate_background
     # camera.annotate_frame_num = video_annotate_frame_num
-    
+
     # Run the camera to capture initial exposure values
     camera.iso = 100
     camera.start_preview()
     # Wait for automatic gain control to settle
-    time.sleep( int(20/video_framerate) )
+    time.sleep(int(20/video_framerate))
     # Now fix the values
     camera.shutter_speed = camera.exposure_speed
     brightness = camera.brightness
@@ -246,10 +254,10 @@ with picamera.PiCamera() as camera:
     print "Camera Brightness: %s" % brightness
 
     # Set up mask image
-    drawOvermask()
-    
+    draw_overmask()
+
     # Now loop, within context of this camera object so we don't have to re-initialise
-    
+
     # MAIN LOOP START
     with picamera.PiCameraCircularIO(camera, seconds=buffer_length) as stream:
         # Pre-populare the camera buffer. Need a short buffer so it's always overflowing
@@ -285,12 +293,12 @@ with picamera.PiCamera() as camera:
                 frame_yuv_array = np.array(frame_yuv)
                 frame_y = frame_yuv_array[0:width, 0:height, 0]
 
-                # Output overall brightness calculation. Later, we'll use this to 
-                # Handle flash frame discrimination
+                # Output overall brightness calculation.
+                # Later, we'll use this to handle flash frame discrimination
                 frame_brightness = get_brightness(frame_new)
 
-    			#~ mask = Image.fromarray(frame_y, "L")
-    			#~ mask.save("mask-before.jpeg")
+                # mask = Image.fromarray(frame_y, "L")
+                # mask.save("mask-before.jpeg")
 
                 # ***** MASK PROCESSING *****
     			# Clip low values to black (transparent)
@@ -298,13 +306,13 @@ with picamera.PiCamera() as camera:
                 low_clip_indices = frame_y < threshold_low
                 # ...then set values at those indices to zero
                 frame_y[low_clip_indices] = 0
-                
+
                 # Clip high values to white (solid)
                 # First index the high values...
                 high_clip_indices = frame_y > threshold_high
                 # ...then set values at those indices to 255
                 frame_y[high_clip_indices] = 255
-                
+
                 # Make mask image from Numpy array frame_y
                 mask = Image.fromarray(frame_y, "L")
                 # mask.save("mask-after.jpeg")
@@ -312,32 +320,32 @@ with picamera.PiCamera() as camera:
                 # ***** COMPOSITE NEW FRAME *****
                 # Convert captured frame to RGBA
                 frame_new = frame_new.convert("RGBA")
-                
+
                 # Combine captured frame with rolling composite, via computed mask
                 # TODO: Check this is really doing what we think it is
-                composite.paste(frame_new, (0,0), mask)
-                
+                composite.paste(frame_new, (0, 0), mask)
+
                 # Apply overlay mask
-                composite.paste(overmask, (0,0), ImageOps.invert(overmask))
-                
-                # ***** DISPLAY NEW FRAME *****    
+                composite.paste(overmask, (0, 0), ImageOps.invert(overmask))
+
+                # ***** DISPLAY NEW FRAME *****
                 raw_str = composite.tostring("raw", 'RGBA')
                 pygame_surface = pygame.image.fromstring(raw_str, size, 'RGBA')
-                
+
                 # Finally, update the window
-                screen.blit(pygame_surface, (0,0))
+                screen.blit(pygame_surface, (0, 0))
                 pygame.display.flip()
-                
+
                 # ***** OUTPUT FRAME STATS AND INFO *****
                 time_taken = time.time() - time_start
                 time_since_begin = time.time() - time_begin
                 print "Frame %d in %.3f secs, at %.2f fps: shutter: %d, low: %d high: %d" % (frame_count, time_taken, (frame_count/time_since_begin), camera.shutter_speed, threshold_low, threshold_high)
-                
+
                 frame_count += 1
-                
-                if (frame_count % framedump_interval == 0):
+
+                if frame_count % framedump_interval == 0:
                     framedump()
-                
+
                 # ***** /LOOP *****
 
         finally:
