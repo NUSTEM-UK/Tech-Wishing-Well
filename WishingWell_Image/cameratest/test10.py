@@ -1,5 +1,5 @@
 # Based on forum code by OutoftheBOTS:
-# https://www.raspberrypi.org/forums/viewtopic.php?f=63&t=194059&sid=c31bbc7bbc9276a185b4498da04acf52#p1215709
+# https://www.raspberrypi.org/forums/viewtopic.php?f=63&t=194059&sid=c31bbc7bbc9276a185b4498da04acf52#p1215709
 
 import time
 
