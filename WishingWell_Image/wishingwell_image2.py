@@ -9,9 +9,9 @@ import io, time, sys
 import pygame
 
 import picamera
-import picamera.array
+# import picamera.array
 # from picamera import PiCamera
-# from picamera.array import PiRGBArray
+from picamera.array import PiRGBArray
 from PIL import Image, ImageStat, ImageOps, ImageDraw
 import numpy as np
 import os.path
@@ -249,7 +249,8 @@ frame_count = 1
 
 # Work through the stream of images from the camera
 for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=True):
-    frame_new = frame.array  # the frame will be stored in the variable called image
+    # frame_new = frame.array  # the frame will be stored in the variable called image
+    frame_new = Image.frombytes('RGB', size, rawCapture.read(frame.frame_size))
     # BEGIN Image processing code 
     
     # Create YUV conversion for luminosity mask processing
