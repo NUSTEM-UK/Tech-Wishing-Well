@@ -296,6 +296,9 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
     screen.blit(pygame_surface, (0,0))
     pygame.display.flip()
 
+    # Handle PyGame events (ie. keypress controls)
+    handlePygameEvents()
+
     time_taken = time.time() - time_start
     time_since_begin = time.time() - time_begin
     print "Frame %d in %.3f secs, at %.2f fps: shutter: %d, low: %d high: %d" % (frame_count, time_taken, (frame_count/time_since_begin), camera.shutter_speed, threshold_low, threshold_high)
