@@ -57,7 +57,7 @@ pygame.display.flip()
 # Initialise PIL image to black background
 composite = Image.frombytes('RGB', size, "\x00" * width * height * 3)
 composite = composite.convert('RGBA')
-raw_str = composite.tostring("raw", 'RGBA')
+raw_str = composite.tobytes("raw", 'RGBA')
 pygame.surface = pygame.image.fromstring(raw_str, size, 'RGBA')
 
 # Set up overlay mask image
@@ -240,7 +240,7 @@ print "Camera Brightness: %s" % brightness
 drawOvermask()
 
 # Note that array size arguments are the other way around to the camera resolution. Just to catch you out.
-rawCapture = picamera.PiRGBArray(camera, size=(height, width))
+rawCapture = PiRGBArray(camera, size=(height, width))
 time.sleep(0.1)
 
 time_begin = time.time()
@@ -249,8 +249,10 @@ frame_count = 1
 
 # Work through the stream of images from the camera
 for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=True):
-    frame_new = frame.array
-    # frame_new = Image.frombytes('RGB', size, rawCapture.read(frame.frame_size))
+    # frame_new = frame.array
+    # frame_new = Image.frombytes('RGB', size, rawCapture.read(frame_size))
+    frame_new = Image.frombytes('RGB', size, frame.array)
+    
     # BEGIN Image processing code 
     
     # Create YUV conversion for luminosity mask processing
@@ -287,7 +289,7 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
     composite.paste(overmask, (0,0), ImageOps.invert(overmask))
     
     # ***** DISPLAY NEW FRAME *****    
-    raw_str = composite.tostring("raw", 'RGBA')
+    raw_str = composite.tobytes("raw", 'RGBA')
     pygame_surface = pygame.image.fromstring(raw_str, size, 'RGBA')
     
     # Finally, update the window
