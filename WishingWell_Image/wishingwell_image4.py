@@ -253,15 +253,18 @@ for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=
     
     # frame_new = Image.frombytes('RGB', size, frame.array)
     # frame_yuv = Image.frombytes('yuv', size, frame.array)
-    frame_rgb_array = frame.array
-    frame_rgb_image = Image.fromarray(frame_rgb_array)
+    #frame_rgb_array = frame.array
+    #frame_rgb_image = Image.fromarray(frame_rgb_array)
+    frame_rgb_image = Image.fromarray(frame.array)
 
     # BEGIN Image processing code 
     
     # Create YUV conversion for luminosity mask processing
-    frame_yuv = frame_rgb_image.convert("YCbCr")
-    frame_yuv_array = np.array(frame_yuv)
-    frame_y = frame_yuv_array[0:width, 0:height, 0]
+    #frame_yuv = frame_rgb_image.convert("YCbCr")
+    #frame_yuv_array = np.array(frame_yuv)
+    #frame_yuv_array = np.array(frame_rgb_image.convert("YCbCr"))
+    #frame_y = frame_yuv_array[0:width, 0:height, 0]
+    frame_y = np.array(frame_rgb_image.convert("YCbCr"))[0:width, 0:height, 0]
 
     # ***** MASK PROCESSING *****
     # Clip low values to black (transparent)
