@@ -249,8 +249,8 @@ frame_count = 1
 
 # Work through the stream of images from the camera
 for frame in camera.capture_continuous(rawCapture, format="rgb", use_video_port=True):
-    # frame_new = frame.array  # the frame will be stored in the variable called image
-    frame_new = Image.frombytes('RGB', size, rawCapture.read(frame.frame_size))
+    frame_new = frame.array
+    # frame_new = Image.frombytes('RGB', size, rawCapture.read(frame.frame_size))
     # BEGIN Image processing code 
     
     # Create YUV conversion for luminosity mask processing
