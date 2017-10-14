@@ -17,6 +17,7 @@
 # sudo apt install python-matplotlib
 # Requires a *local* mqtt broker, for example via:
 # sudo apt install mosquitto
+# sudo apt install python-QT4
 
 from PyQt4 import QtCore, QtGui
 import paho.mqtt.client as mqtt
