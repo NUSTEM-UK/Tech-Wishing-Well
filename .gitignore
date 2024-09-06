@@ -3,3 +3,5 @@ real_config.py
 timer.pyc
 .AppleDouble/
 picamimg.jpg
+
+.DS_Store
